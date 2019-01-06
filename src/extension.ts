@@ -49,8 +49,9 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	});
 
+
 	const routeAutocompleteProvider = vscode.languages.registerCompletionItemProvider(
-		'php',
+		["php", "blade"],
 		{
 			provideCompletionItems(document: vscode.TextDocument, position: vscode.Position) {
 

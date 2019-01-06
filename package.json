@@ -2,7 +2,8 @@
 	"name": "laravel-extra-intellisense",
 	"displayName": "Laravel Extra Intellisense",
 	"description": "Laravel better intellisense",
-	"version": "0.0.1",
+	"version": "0.0.2",
+    "publisher": "amiralizadeh9480",
 	"engines": {
 		"vscode": "^1.30.0"
 	},
@@ -10,8 +11,13 @@
 		"Languages"
 	],
 	"activationEvents": [
-		"onLanguage:php"
+		"onLanguage:php",
+		"onLanguage:blade"
 	],
+	"repository": {
+        "type": "git",
+        "url": "https://github.com/amir9480/vscode-laravel-extra-intellisense"
+    },
 	"main": "./out/extension.js",
 	"contributes": {},
 	"scripts": {
