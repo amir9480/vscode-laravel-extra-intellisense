@@ -1,9 +1,10 @@
 {
 	"name": "laravel-extra-intellisense",
 	"displayName": "Laravel Extra Intellisense",
-	"description": "Laravel better intellisense",
+	"description": "better intellisense for laravel projects.",
 	"version": "0.0.2",
     "publisher": "amiralizadeh9480",
+	"icon": "images/icon.png",
 	"engines": {
 		"vscode": "^1.30.0"
 	},
