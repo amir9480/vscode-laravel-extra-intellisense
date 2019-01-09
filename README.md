@@ -13,17 +13,21 @@ This extension adds [laravel](https://laravel.com/) routes and views autocomplet
 
 ## Release Notes
 
-### 0.0.1
-Add route autocomplete.
+### 0.0.5
+Route bug fix.
 
-### 0.0.2
-Blade bug fix.
+### 0.0.4
+View names with namespaces ready to use.
 
 ### 0.0.3
 View functions autocompelete added.
 
-### 0.0.4
-View names with namespaces ready to use.
+### 0.0.2
+Blade bug fix.
+
+### 0.0.1
+Add route autocomplete.
+
 
 ## Recommended extensions
 * [PHP Intelephense](https://marketplace.visualstudio.com/items?itemName=bmewburn.vscode-intelephense-client)
