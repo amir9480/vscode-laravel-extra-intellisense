@@ -29,7 +29,7 @@ export default class RouteProvider {
 
                     if (linePrefix.substr(linePrefix.indexOf("route") + 5).includes(",")) {
                         // route parameters autocomplete
-                        var currentRoute = (/\(('|")([A-Za-z0-9_-]+)('|")/g).exec(linePrefix);
+                        var currentRoute = (/\(('|")([^\'^\"]+)('|")/g).exec(linePrefix);
                         if (currentRoute != null && currentRoute[2].length > 0) {
                             for (var i in self.routes) {
                                 if (self.routes[i].route == currentRoute[2]) {
