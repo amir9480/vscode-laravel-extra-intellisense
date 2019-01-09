@@ -24,6 +24,7 @@ export default class ViewProvider {
                     let linePrefix = document.lineAt(position).text.substr(0, position.character).toLowerCase().trim();
                     if (!(
                         linePrefix.includes("view") ||
+                        linePrefix.includes("->links") ||
                         linePrefix.includes("@extends") ||
                         linePrefix.includes("@component") ||
                         linePrefix.includes("@include") ||

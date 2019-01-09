@@ -22,6 +22,9 @@ Blade bug fix.
 ### 0.0.3
 View functions autocompelete added.
 
+### 0.0.4
+View names with namespaces ready to use.
+
 ## Recommended extensions
 * [PHP Intelephense](https://marketplace.visualstudio.com/items?itemName=bmewburn.vscode-intelephense-client)
 * [PHPCS](https://marketplace.visualstudio.com/items?itemName=ikappas.phpcs)
