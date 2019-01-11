@@ -11,7 +11,16 @@ This extension adds [laravel](https://laravel.com/) routes and views autocomplet
 ![Screen Shot](/images/screenshot3.jpg)
 *Views*
 
+## Autocomplete
+* Route names.
+* Route parameters.
+* Views.
+* configs.
+
 ## Release Notes
+
+### 0.0.6
+Config autocomplete added.
 
 ### 0.0.5
 Route bug fix.

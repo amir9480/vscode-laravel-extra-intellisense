@@ -2,7 +2,6 @@
 
 import * as vscode from 'vscode';
 import * as fs from "fs";
-import * as cp from "child_process";
 import Helpers from './helpers';
 
 
@@ -49,9 +48,9 @@ export default class ViewProvider {
     loadViews (root?: string) {
         if (fs.existsSync(Helpers.projectPath("vendor/autoload.php")) && fs.existsSync(Helpers.projectPath("bootstrap/app.php"))) {
             try {
-                var command = "php -r \"define('LARAVEL_START', microtime(true));require_once '" + Helpers.projectPath("vendor/autoload.php") + "'; require_once '" + Helpers.projectPath("bootstrap/app.php") + "';$kernel = $app->make(Illuminate\\Contracts\\Http\\Kernel::class);$response = $kernel->handle(     $request = Illuminate\\Http\\Request::capture() );echo json_encode(app('view')->getFinder()->getHints());\"";
-                var viewPaths = JSON.parse(cp.execSync(command.replace("getHints", "getPaths")).toString());
-                var viewNamespaces = JSON.parse(cp.execSync(command).toString());
+                var code = "echo json_encode(app('view')->getFinder()->getHints());";
+                var viewPaths = JSON.parse(Helpers.runPhp(code.replace("getHints", "getPaths")));
+                var viewNamespaces = JSON.parse(Helpers.runPhp(code));
                 this.views = [];
                 for (var i in viewPaths) {
                     this.views = this.views.concat(this.getViews(viewPaths[i]));
