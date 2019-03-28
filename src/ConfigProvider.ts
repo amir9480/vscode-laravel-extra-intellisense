@@ -1,12 +1,10 @@
 'use strict';
 
 import * as vscode from 'vscode';
-import * as fs from "fs";
 import Helpers from './helpers';
 
 
 export default class ConfigProvider {
-    private provider: any;
     configs: Array<any> = [];
 
     constructor () {
@@ -23,6 +21,7 @@ export default class ConfigProvider {
         ) {
             for (var i in this.configs) {
                 var completeItem = new vscode.CompletionItem(this.configs[i].name, vscode.CompletionItemKind.Value);
+                completeItem.range = document.getWordRangeAtPosition(position, Helpers.wordMatchRegex);
                 if (this.configs[i].value) {
                     completeItem.detail = this.configs[i].value.toString();
                 }
@@ -32,14 +31,13 @@ export default class ConfigProvider {
         return out;
     }
 
-    loadConfigs (root?: string) {
-        if (fs.existsSync(Helpers.projectPath("vendor/autoload.php")) && fs.existsSync(Helpers.projectPath("bootstrap/app.php"))) {
-            try {
-                var configs = JSON.parse(Helpers.runLaravel("echo json_encode(config()->all());"));
-                this.configs = this.getConfigs(configs);
-            } catch (exception) {
-                console.error(exception);
-            }
+    loadConfigs () {
+        try {
+            var configs = JSON.parse(Helpers.runLaravel("echo json_encode(config()->all());"));
+            this.configs = this.getConfigs(configs);
+        } catch (exception) {
+            console.error(exception);
+            setTimeout(() => this.loadConfigs(), 20000);
         }
     }
 
@@ -47,7 +45,7 @@ export default class ConfigProvider {
         var out: Array<any> = [];
         for (var i in conf) {
             if (conf[i] instanceof Array) {
-                out.push({name: i, value: conf[i]});
+                out.push({name: i, value: 'array(...)'});
             } else if (conf[i] instanceof Object) {
                 out.push({name: i, value: 'array(...)'});
                 out = out.concat(this.getConfigs(conf[i]).map(function (c) {
@@ -59,9 +57,5 @@ export default class ConfigProvider {
             }
         }
         return out;
-    }
-
-    getProvider () {
-        return this.provider;
     }
 }

@@ -6,6 +6,8 @@ import * as fs from 'fs';
 
 export default class Helpers {
 
+	static wordMatchRegex = /[\w\d\-_\.\:]+/g;
+
 	/**
 	 * Create full path from project file name
 	 *

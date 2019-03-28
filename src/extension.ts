@@ -7,6 +7,7 @@ import Helpers from "./helpers";
 import RouteProvider from "./RouteProvider";
 import ViewProvider from "./ViewProvider";
 import ConfigProvider from './ConfigProvider';
+import TranslationProvider from './TranslationProvider';
 
 
 
@@ -16,6 +17,7 @@ export function activate(context: vscode.ExtensionContext) {
 			var routeProider = new RouteProvider;
 			var viewProvider = new ViewProvider;
 			var configProvider = new ConfigProvider;
+			var translationProvider = new TranslationProvider;
 			vscode.workspace.onDidSaveTextDocument(function(event: vscode.TextDocument) {
 				if (event.fileName.toLowerCase().includes("route") && event.fileName.toLowerCase().includes("php")) {
 					routeProider.loadRoutes();
@@ -25,6 +27,9 @@ export function activate(context: vscode.ExtensionContext) {
 				}
 				if (event.fileName.toLowerCase().includes("config") && event.fileName.toLowerCase().includes("php")) {
 					configProvider.loadConfigs();
+				}
+				if (event.fileName.toLowerCase().includes("lang") || event.fileName.toLowerCase().includes("trans") || event.fileName.toLowerCase().includes("localization")) {
+					translationProvider.loadTranslations();
 				}
 			});
 
@@ -39,11 +44,13 @@ export function activate(context: vscode.ExtensionContext) {
 						out = out.concat(routeProider.getItems(document, position, token, context));
 						out = out.concat(viewProvider.getItems(document, position, token, context));
 						out = out.concat(configProvider.getItems(document, position, token, context));
+						out = out.concat(translationProvider.getItems(document, position, token, context));
 						return out;
 					}
 				},
-				...("\"'()@[]{}ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789".split(""))
+				...("\"'".split(""))
 			);
+			// \"'()@[]{},.ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789
 			context.subscriptions.push(provider);
 		}
 	}

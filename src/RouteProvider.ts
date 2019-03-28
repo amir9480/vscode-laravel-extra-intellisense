@@ -25,6 +25,7 @@ export default class RouteProvider {
                     if (this.routes[i].name == func.parameters[0]) {
                         for (var j in this.routes[i].parameters) {
                             var compeleteItem = new vscode.CompletionItem(this.routes[i].parameters[j], vscode.CompletionItemKind.Variable);
+                            compeleteItem.range = document.getWordRangeAtPosition(position, Helpers.wordMatchRegex);
                             out.push(compeleteItem);
                         }
                         return out;
@@ -35,6 +36,7 @@ export default class RouteProvider {
             // route name autocomplete
             for (var i in this.routes) {
                 var compeleteItem2 = new vscode.CompletionItem(this.routes[i].name, vscode.CompletionItemKind.Enum);
+                compeleteItem2.range = document.getWordRangeAtPosition(position, Helpers.wordMatchRegex);
                 compeleteItem2.detail = this.routes[i].action +
                                         "\n\n" +
                                         this.routes[i].method +
