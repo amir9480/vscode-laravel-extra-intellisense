@@ -3,6 +3,7 @@
 import * as vscode from 'vscode';
 import * as cp from 'child_process';
 import * as fs from 'fs';
+import * as os from 'os';
 
 export default class Helpers {
 
@@ -48,10 +49,19 @@ export default class Helpers {
 	 */
 	static runPhp(code: string) : string {
 		code = code.replace(/\"/g, "\\\"");
+		if (['linux', 'openbsd', 'sunos', 'darwin'].some(unixPlatforms => os.platform().includes(unixPlatforms))) {
+			code = code.replace(/\$/g, "\\$");
+		}
 		var command = "php -r \"" + code + "\"";
 		return cp.execSync(command).toString();
 	}
 
+	/**
+	 * Parse php function call.
+	 *
+	 * @param text
+	 * @param position
+	 */
 	static parseFunction(text: string, position: number): any {
 		var funcsRegex = /((([A-Za-z0-9_]+)::)?([@A-Za-z0-9_]+)\()((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*)\)/g;
 		var paramsRegex = /((\s*\,\s*)?)(\[.*\]|array\(.*\)|(\"((\\\")|[^\"])*\")|(\'((\\\')|[^\'])*\'))/g;
