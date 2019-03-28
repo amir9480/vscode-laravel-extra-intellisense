@@ -6,51 +6,33 @@ import Helpers from './helpers';
 
 
 export default class ViewProvider {
-    private provider: any;
     views: Array<string> = [];
 
     constructor () {
         this.loadViews();
-        var self = this;
-        this.provider = vscode.languages.registerCompletionItemProvider(
-            [
-                { scheme: 'file', language: 'php' },
-                { scheme: 'file', language: 'blade' }
-            ],
-            {
-                provideCompletionItems(document: vscode.TextDocument, position: vscode.Position) {
+    }
 
-                    let linePrefix = document.lineAt(position).text.substr(0, position.character).toLowerCase().trim();
-                    if (!(
-                        linePrefix.includes("view") ||
-                        linePrefix.includes("->links") ||
-                        linePrefix.includes("@extends") ||
-                        linePrefix.includes("@component") ||
-                        linePrefix.includes("@include") ||
-                        linePrefix.includes("@each")
-                    )) {
-                        return undefined;
-                    }
-
-                    var out:Array<vscode.CompletionItem> = [];
-
-                    for (var i in self.views) {
-                        out.push(new vscode.CompletionItem(self.views[i], vscode.CompletionItemKind.File));
-                    }
-                    return out;
-                }
-            },
-            '"',
-            "'"
-        );
+    getItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, context: vscode.CompletionContext): Array<vscode.CompletionItem> {
+        var pos = document.offsetAt(position);
+        var func = Helpers.parseFunction(document.getText(), pos);
+        var out:Array<vscode.CompletionItem> = [];
+        if (func &&
+            (context.triggerCharacter == '"' || context.triggerCharacter == "'" || func.parameters.length > 0) &&
+            ((func.class && func.class == 'View') || ['view', 'links', '@extends', '@component', '@include', '@each'].some(fn => func.function.includes(fn)))
+        ) {
+            for (var i in this.views) {
+                out.push(new vscode.CompletionItem(this.views[i], vscode.CompletionItemKind.Constant));
+            }
+        }
+        return out;
     }
 
     loadViews (root?: string) {
         if (fs.existsSync(Helpers.projectPath("vendor/autoload.php")) && fs.existsSync(Helpers.projectPath("bootstrap/app.php"))) {
             try {
                 var code = "echo json_encode(app('view')->getFinder()->getHints());";
-                var viewPaths = JSON.parse(Helpers.runPhp(code.replace("getHints", "getPaths")));
-                var viewNamespaces = JSON.parse(Helpers.runPhp(code));
+                var viewPaths = JSON.parse(Helpers.runLaravel(code.replace("getHints", "getPaths")));
+                var viewNamespaces = JSON.parse(Helpers.runLaravel(code));
                 this.views = [];
                 for (var i in viewPaths) {
                     this.views = this.views.concat(this.getViews(viewPaths[i]));
@@ -87,9 +69,5 @@ export default class ViewProvider {
             });
         }
         return out;
-    }
-
-    getProvider () {
-        return this.provider;
     }
 }

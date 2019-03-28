@@ -11,46 +11,32 @@ export default class ConfigProvider {
 
     constructor () {
         this.loadConfigs();
-        var self = this;
-        this.provider = vscode.languages.registerCompletionItemProvider(
-            [
-                { scheme: 'file', language: 'php' },
-                { scheme: 'file', language: 'blade' }
-            ],
-            {
-                provideCompletionItems(document: vscode.TextDocument, position: vscode.Position) {
+    }
 
-                    let linePrefix = document.lineAt(position).text.substr(0, position.character).toLowerCase().trim();
-                    if (!(
-                        linePrefix.includes("config")
-                    )) {
-                        return undefined;
-                    }
-
-                    var out:Array<vscode.CompletionItem> = [];
-
-                    for (var i in self.configs) {
-                        var completeItem = new vscode.CompletionItem(self.configs[i].name, vscode.CompletionItemKind.File);
-                        if (self.configs[i].value instanceof String) {
-                            completeItem.detail = self.configs[i].value.substr(25);
-                        }
-                        out.push(completeItem);
-                    }
-                    return out;
+    getItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, context: vscode.CompletionContext): Array<vscode.CompletionItem> {
+        var pos = document.offsetAt(position);
+        var func = Helpers.parseFunction(document.getText(), pos);
+        var out:Array<vscode.CompletionItem> = [];
+        if (func &&
+            (context.triggerCharacter == '"' || context.triggerCharacter == "'" || func.parameters.length > 0) &&
+            ((func.class && func.class == 'Config') || func.function.toLowerCase() == 'config')
+        ) {
+            for (var i in this.configs) {
+                var completeItem = new vscode.CompletionItem(this.configs[i].name, vscode.CompletionItemKind.Value);
+                if (this.configs[i].value) {
+                    completeItem.detail = this.configs[i].value.toString();
                 }
-            },
-            '"',
-            "'"
-        );
+                out.push(completeItem);
+            }
+        }
+        return out;
     }
 
     loadConfigs (root?: string) {
         if (fs.existsSync(Helpers.projectPath("vendor/autoload.php")) && fs.existsSync(Helpers.projectPath("bootstrap/app.php"))) {
             try {
-                var configs = JSON.parse(Helpers.runPhp("echo json_encode(config()->all());"));
+                var configs = JSON.parse(Helpers.runLaravel("echo json_encode(config()->all());"));
                 this.configs = this.getConfigs(configs);
-                console.log(this.configs);
-
             } catch (exception) {
                 console.error(exception);
             }
@@ -63,6 +49,7 @@ export default class ConfigProvider {
             if (conf[i] instanceof Array) {
                 out.push({name: i, value: conf[i]});
             } else if (conf[i] instanceof Object) {
+                out.push({name: i, value: 'array(...)'});
                 out = out.concat(this.getConfigs(conf[i]).map(function (c) {
                     c.name = i + "." + c.name;
                     return c;

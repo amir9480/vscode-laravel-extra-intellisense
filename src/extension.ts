@@ -28,11 +28,23 @@ export function activate(context: vscode.ExtensionContext) {
 				}
 			});
 
-			context.subscriptions.push(
-				routeProider.getProvider(),
-				viewProvider.getProvider(),
-				configProvider.getProvider()
+			var provider = vscode.languages.registerCompletionItemProvider(
+				[
+					{ scheme: 'file', language: 'php' },
+					{ scheme: 'file', language: 'blade' }
+				],
+				{
+					provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, context: vscode.CompletionContext): vscode.ProviderResult<vscode.CompletionItem[] | vscode.CompletionList> {
+						var out:Array<vscode.CompletionItem> = [];
+						out = out.concat(routeProider.getItems(document, position, token, context));
+						out = out.concat(viewProvider.getItems(document, position, token, context));
+						out = out.concat(configProvider.getItems(document, position, token, context));
+						return out;
+					}
+				},
+				...("\"'()@[]{}ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789".split(""))
 			);
+			context.subscriptions.push(provider);
 		}
 	}
 }
