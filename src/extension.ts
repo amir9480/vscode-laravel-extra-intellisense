@@ -8,6 +8,7 @@ import RouteProvider from "./RouteProvider";
 import ViewProvider from "./ViewProvider";
 import ConfigProvider from './ConfigProvider';
 import TranslationProvider from './TranslationProvider';
+import MixProvider from './MixProvider';
 
 
 
@@ -18,6 +19,7 @@ export function activate(context: vscode.ExtensionContext) {
 			var viewProvider = new ViewProvider;
 			var configProvider = new ConfigProvider;
 			var translationProvider = new TranslationProvider;
+			var mixProvider = new MixProvider;
 			vscode.workspace.onDidSaveTextDocument(function(event: vscode.TextDocument) {
 				if (event.fileName.toLowerCase().includes("route") && event.fileName.toLowerCase().includes("php")) {
 					routeProider.loadRoutes();
@@ -45,12 +47,12 @@ export function activate(context: vscode.ExtensionContext) {
 						out = out.concat(viewProvider.getItems(document, position, token, context));
 						out = out.concat(configProvider.getItems(document, position, token, context));
 						out = out.concat(translationProvider.getItems(document, position, token, context));
+						out = out.concat(mixProvider.getItems(document, position, token, context));
 						return out;
 					}
 				},
 				...("\"'".split(""))
 			);
-			// \"'()@[]{},.ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789
 			context.subscriptions.push(provider);
 		}
 	}

@@ -19,6 +19,14 @@ This extension adds [laravel](https://laravel.com/) routes and views autocomplet
 
 ## Release Notes
 
+### 0.1.1
+Add mix autocomplete.
+
+### 0.1.0
+Fix problems with linux.
+Add translation autocomplete.
+Improved providers.
+
 ### 0.0.6
 Config autocomplete added.
 
