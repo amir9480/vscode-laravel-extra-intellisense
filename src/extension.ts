@@ -20,18 +20,37 @@ export function activate(context: vscode.ExtensionContext) {
 			var configProvider = new ConfigProvider;
 			var translationProvider = new TranslationProvider;
 			var mixProvider = new MixProvider;
+			var providerTimers:any = {
+				route: null,
+				view: null,
+				config: null,
+				translation: null,
+				mix: null
+			};
 			vscode.workspace.onDidSaveTextDocument(function(event: vscode.TextDocument) {
-				if (event.fileName.toLowerCase().includes("route") && event.fileName.toLowerCase().includes("php")) {
-					routeProider.loadRoutes();
+				if (providerTimers.route !== null && event.fileName.toLowerCase().includes("route") && event.fileName.toLowerCase().includes("php")) {
+					providerTimers.route = setTimeout(function () {
+						routeProider.loadRoutes();
+						providerTimers.route = null;
+					}, 2000);
 				}
-				if (event.fileName.toLowerCase().includes("blade.php")) {
-					viewProvider.loadViews();
+				if (providerTimers.view !== null && event.fileName.toLowerCase().includes("blade.php")) {
+					providerTimers.view = setTimeout(function () {
+						viewProvider.loadViews();
+						providerTimers.view = null;
+					}, 2000);
 				}
-				if (event.fileName.toLowerCase().includes("config") && event.fileName.toLowerCase().includes("php")) {
-					configProvider.loadConfigs();
+				if (providerTimers.config !== null && event.fileName.toLowerCase().includes("config") && event.fileName.toLowerCase().includes("php")) {
+					providerTimers.config = setTimeout(function () {
+						configProvider.loadConfigs();
+						providerTimers.config = null;
+					}, 2000);
 				}
-				if (event.fileName.toLowerCase().includes("lang") || event.fileName.toLowerCase().includes("trans") || event.fileName.toLowerCase().includes("localization")) {
-					translationProvider.loadTranslations();
+				if (providerTimers.translation !== null && event.fileName.toLowerCase().includes("lang") || event.fileName.toLowerCase().includes("trans") || event.fileName.toLowerCase().includes("localization")) {
+					providerTimers.translation = setTimeout(function () {
+						translationProvider.loadTranslations();
+						providerTimers.translation = null;
+					}, 2000);
 				}
 			});
 

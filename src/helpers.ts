@@ -8,6 +8,7 @@ import * as os from 'os';
 export default class Helpers {
 
 	static wordMatchRegex = /[\w\d\-_\.\:\/]+/g;
+	static phpParser:any = null;
 
 	/**
 	 * Create full path from project file name
@@ -57,46 +58,83 @@ export default class Helpers {
 	}
 
 	/**
+	 * Parse php code with 'php-parser' package.
+	 * @param code
+	 */
+	static parsePhp(code: string): any {
+		if (! Helpers.phpParser) {
+			var PhpEngine = require('php-parser');
+			Helpers.phpParser = new PhpEngine({
+				parser: {
+					extractDoc: true,
+					php7: true
+				},
+				ast: {
+				  withPositions: true
+				}
+			});
+		}
+		try {
+			return Helpers.phpParser.parseCode(code);
+		} catch (exception) {
+			return null;
+		}
+	}
+
+	/**
+	 * Convert php variable defination to javascript variable.
+	 * @param code
+	 */
+	static evalPhp(code: string): any {
+		var out = Helpers.parsePhp('<?php ' + code + ';');
+		if (out && typeof out.children[0] !== 'undefined') {
+			return out.children[0].expression.value;
+		}
+		return undefined;
+	}
+
+	/**
 	 * Parse php function call.
 	 *
 	 * @param text
 	 * @param position
 	 */
-	static parseFunction(text: string, position: number): any {
-		var funcsRegex = /((([A-Za-z0-9_]+)::)?([@A-Za-z0-9_]+)\()((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*)\)/g;
+	static parseFunction(text: string, position: number, level: number = 0): any {
+		var funcsRegex = /((([A-Za-z0-9_]+)::)?([@A-Za-z0-9_]+)\()((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*)(\)|$)/g;
 		var paramsRegex = /((\s*\,\s*)?)(\[.*\]|array\(.*\)|(\"((\\\")|[^\"])*\")|(\'((\\\')|[^\'])*\'))/g;
 		var inlineFunctionMatch = /\((([\s\S]*\,)?\s*function\s*\(.*\)\s*\{)([\S\s]*)\}/g;
 
 		var match = null;
 		var match2 = null;
-
-		while ((match = funcsRegex.exec(text)) !== null) {
-			if (position >= match.index && position < match.index + match[0].length) {
-				if (match2 = inlineFunctionMatch.exec(match[0])) {
-					return this.parseFunction(match2[3], position - (match.index + match[1].length + match2[1].length));
-				} else {
-					var textParameters = [];
-					var paramIndex = null;
-					var paramIndexCounter = 0;
-					var paramsPosition = position - (match.index + match[1].length);
-					while ((match2 = paramsRegex.exec(match[5])) !== null) {
-						textParameters.push(match2[3]);
-						if (paramsPosition >= match2.index && paramsPosition < match2.index + match2[0].length) {
-							paramIndex = paramIndexCounter;
+		if (level < 6) {
+			while ((match = funcsRegex.exec(text)) !== null) {
+				if (position >= match.index && position < match.index + match[0].length) {
+					if (match2 = inlineFunctionMatch.exec(match[0])) {
+						return this.parseFunction(match2[3], position - (match.index + match[1].length + match2[1].length), level + 1);
+					} else {
+						var textParameters = [];
+						var paramIndex = null;
+						var paramIndexCounter = 0;
+						var paramsPosition = position - (match.index + match[1].length);
+						while ((match2 = paramsRegex.exec(match[5])) !== null) {
+							textParameters.push(match2[3]);
+							if (paramsPosition >= match2.index && paramsPosition < match2.index + match2[0].length) {
+								paramIndex = paramIndexCounter;
+							}
+							paramIndexCounter++;
 						}
-						paramIndexCounter++;
+						var functionParametrs = [];
+						for (var i in textParameters) {
+							functionParametrs.push(this.evalPhp(textParameters[i]));
+						}
+						return {
+							'class': match[3],
+							'function': match[4],
+							'paramIndex': paramIndex,
+							'parameters': functionParametrs,
+							'textParameters': textParameters
+						};
 					}
-					var functionParametrs = [];
-					for (var i in textParameters) {
-						functionParametrs.push(JSON.parse(this.runPhp("echo json_encode(" + textParameters[i] + ");")));
-					}
-					return {
-						'class': match[3],
-						'function': match[4],
-						'paramIndex': paramIndex,
-						'parameters': functionParametrs,
-						'textParameters': textParameters
-					};
 				}
 			}
 		}

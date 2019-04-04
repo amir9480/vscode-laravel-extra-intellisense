@@ -2,8 +2,8 @@
 	"name": "laravel-extra-intellisense",
 	"displayName": "Laravel Extra Intellisense",
 	"description": "better intellisense for laravel projects.",
-	"version": "0.1.1",
-    "publisher": "amiralizadeh9480",
+	"version": "0.1.2",
+	"publisher": "amiralizadeh9480",
 	"icon": "images/icon.png",
 	"engines": {
 		"vscode": "^1.30.0"
@@ -16,9 +16,9 @@
 		"onLanguage:blade"
 	],
 	"repository": {
-        "type": "git",
-        "url": "https://github.com/amir9480/vscode-laravel-extra-intellisense"
-    },
+		"type": "git",
+		"url": "https://github.com/amir9480/vscode-laravel-extra-intellisense"
+	},
 	"main": "./out/extension.js",
 	"contributes": {},
 	"scripts": {
@@ -33,6 +33,7 @@
 		"vscode": "^1.1.25",
 		"tslint": "^5.8.0",
 		"@types/node": "^8.10.25",
-		"@types/mocha": "^2.2.42"
+		"@types/mocha": "^2.2.42",
+		"php-parser": "^3.0.0-prerelease.8"
 	}
 }

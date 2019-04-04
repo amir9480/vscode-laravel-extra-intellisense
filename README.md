@@ -12,12 +12,16 @@ This extension adds [laravel](https://laravel.com/) routes and views autocomplet
 *Views*
 
 ## Autocomplete
-* Route names.
-* Route parameters.
-* Views.
-* configs.
+* Route names and route parameters
+* Views
+* Configs
+* Translations and translation parameters
+* Laravel mix function
 
 ## Release Notes
+
+### 0.1.2
+Performance improvments.
 
 ### 0.1.1
 Add mix autocomplete.
@@ -54,3 +58,6 @@ Add route autocomplete.
 * [Laravel Blade Snippets](https://marketplace.visualstudio.com/items?itemName=onecentlin.laravel-blade)
 * [Laravel goto view](https://marketplace.visualstudio.com/items?itemName=codingyu.laravel-goto-view)
 * [Laravel goto controller](https://marketplace.visualstudio.com/items?itemName=stef-k.laravel-goto-controller)
+
+## Credits
+* [PHP parser](https://github.com/glayzzle/php-parser)
