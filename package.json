@@ -2,7 +2,7 @@
 	"name": "laravel-extra-intellisense",
 	"displayName": "Laravel Extra Intellisense",
 	"description": "better intellisense for laravel projects.",
-	"version": "0.1.2",
+	"version": "0.1.4",
 	"publisher": "amiralizadeh9480",
 	"icon": "images/icon.png",
 	"engines": {
@@ -28,12 +28,14 @@
 		"postinstall": "node ./node_modules/vscode/bin/install",
 		"test": "npm run compile && node ./node_modules/vscode/bin/test"
 	},
+	"dependencies": {
+		"php-parser": "^3.0.0-prerelease.8"
+	},
 	"devDependencies": {
 		"typescript": "^3.1.4",
 		"vscode": "^1.1.25",
 		"tslint": "^5.8.0",
 		"@types/node": "^8.10.25",
-		"@types/mocha": "^2.2.42",
-		"php-parser": "^3.0.0-prerelease.8"
+		"@types/mocha": "^2.2.42"
 	}
 }

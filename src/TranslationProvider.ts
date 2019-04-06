@@ -5,21 +5,31 @@ import * as fs from "fs";
 import Helpers from './helpers';
 
 
-export default class TranslationProvider {
-    translations: Array<any> = [];
+export default class TranslationProvider implements vscode.CompletionItemProvider {
+    private timer: any = null;
+    private translations: Array<any> = [];
 
     constructor () {
-        this.loadTranslations();
+        var self = this;
+        setTimeout(() => self.loadTranslations(), 15000);
+        vscode.workspace.onDidSaveTextDocument(function(event: vscode.TextDocument) {
+            if (self.timer === null && (event.fileName.toLowerCase().includes("lang") || event.fileName.toLowerCase().includes("trans") || event.fileName.toLowerCase().includes("localization"))) {
+                self.timer = setTimeout(function () {
+                    self.loadTranslations();
+                    self.timer = null;
+                }, 2000);
+            }
+        });
     }
 
-    getItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, context: vscode.CompletionContext): Array<vscode.CompletionItem> {
-        var pos = document.offsetAt(position);
-        var func = Helpers.parseFunction(document.getText(), pos);
+    provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, context: vscode.CompletionContext): Array<vscode.CompletionItem> {
         var out:Array<vscode.CompletionItem> = [];
-        if (func &&
-            (context.triggerCharacter == '"' || context.triggerCharacter == "'" || func.parameters.length > 0) &&
-            ((func.class && func.class == 'Lang') || ['__', 'trans', '@lang'].some(fn => func.function.includes(fn)))
-        ) {
+        var func = Helpers.parseDocumentFunction(document, position);
+        if (func === null) {
+            return out;
+        }
+
+        if (func && ((func.class && Helpers.tags.trans.classes.some((cls:string) => func.class.includes(cls))) || Helpers.tags.trans.functions.some((fn:string) => func.function.includes(fn)))) {
             if (func.paramIndex == 1) {
                 // parameters autocomplete
                 var paramRegex = /\:([A-Za-z0-9_]+)/g;
@@ -59,8 +69,7 @@ export default class TranslationProvider {
                 delete tranlationNamespaces[i];
             }
             tranlationNamespaces[''] = Helpers.projectPath('resources/lang');
-            translations = [];
-            var self = this;
+            var translationGroups:any = [];
             for (var i in tranlationNamespaces) {
                 if (fs.existsSync(tranlationNamespaces[i]) && fs.lstatSync(tranlationNamespaces[i]).isDirectory()) {
                     fs.readdirSync(tranlationNamespaces[i]).forEach(function (langDir) {
@@ -68,12 +77,17 @@ export default class TranslationProvider {
                         if (fs.existsSync(path) && fs.lstatSync(path).isDirectory()) {
                             fs.readdirSync(path).forEach(function (file) {
                                 if (fs.lstatSync(path + '/' + file).isFile()) {
-                                    translations = translations.concat(self.getTranslations(JSON.parse(Helpers.runLaravel("echo json_encode(__('" + i + file.replace(/\.php/, '') + "'));")), i + file.replace(/\.php/, '')));
+                                    translationGroups.push(i + file.replace(/\.php/, ''));
                                 }
                             });
                         }
                     });
                 }
+            }
+            translationGroups = translationGroups.filter(function(item:any, index:any, array:any){ return array.indexOf(item) === index; });
+            translationGroups = JSON.parse(Helpers.runLaravel("echo json_encode([" + translationGroups.map((transGroup: string) => "'" + transGroup + "' => __('" + transGroup + "')").join(",") + "]);"))
+            for(var i in translationGroups) {
+                translations = translations.concat(this.getTranslations(translationGroups[i], i));
             }
             this.translations = translations;
         } catch (exception) {
@@ -92,7 +106,6 @@ export default class TranslationProvider {
                 out.push({name: prefix + '.' + i, value: translations[i]});
             }
         }
-
         return out;
     }
 }

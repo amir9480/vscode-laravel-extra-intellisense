@@ -5,21 +5,31 @@ import * as fs from "fs";
 import Helpers from './helpers';
 
 
-export default class ViewProvider {
-    views: Array<string> = [];
+export default class ViewProvider implements vscode.CompletionItemProvider {
+    private timer: any = null;
+    private views: Array<string> = [];
 
     constructor () {
-        this.loadViews();
+        var self = this;
+        self.loadViews();
+        vscode.workspace.onDidSaveTextDocument(function(event: vscode.TextDocument) {
+            if (self.timer === null && event.fileName.toLowerCase().includes("config") && event.fileName.toLowerCase().includes("php")) {
+                self.timer = setTimeout(function () {
+                    self.loadViews();
+                    self.timer = null;
+                }, 2000);
+            }
+        });
     }
 
-    getItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, context: vscode.CompletionContext): Array<vscode.CompletionItem> {
-        var pos = document.offsetAt(position);
-        var func = Helpers.parseFunction(document.getText(), pos);
+    provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, context: vscode.CompletionContext): Array<vscode.CompletionItem> {
         var out:Array<vscode.CompletionItem> = [];
-        if (func &&
-            (context.triggerCharacter == '"' || context.triggerCharacter == "'" || func.parameters.length > 0) &&
-            ((func.class && func.class == 'View') || ['view', 'links', '@extends', '@component', '@include', '@each'].some(fn => func.function.includes(fn)))
-        ) {
+        var func = Helpers.parseDocumentFunction(document, position);
+        if (func === null) {
+            return out;
+        }
+
+        if (func && ((func.class && Helpers.tags.view.classes.some((cls:string) => func.class.includes(cls))) || Helpers.tags.view.functions.some((fn:string) => func.function.includes(fn)))) {
             for (var i in this.views) {
                 var compeleteItem = new vscode.CompletionItem(this.views[i], vscode.CompletionItemKind.Constant);
                 compeleteItem.range = document.getWordRangeAtPosition(position, Helpers.wordMatchRegex);

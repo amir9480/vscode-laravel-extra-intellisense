@@ -1,15 +1,9 @@
 # Laravel Extra Intellisense
 
-This extension adds [laravel](https://laravel.com/) routes and views autocomplete to [VSCode](https://code.visualstudio.com/).
+This extension adds [laravel](https://laravel.com/) routes, views and ... autocomplete to [VSCode](https://code.visualstudio.com/).
 
-![Screen Shot](/images/screenshot.jpg)
-*Route names*
+![Screen Shot](/images/screenshot.gif)
 
-![Screen Shot](/images/screenshot2.jpg)
-*Route parameters*
-
-![Screen Shot](/images/screenshot3.jpg)
-*Views*
 
 ## Autocomplete
 * Route names and route parameters
@@ -20,7 +14,7 @@ This extension adds [laravel](https://laravel.com/) routes and views autocomplet
 
 ## Release Notes
 
-### 0.1.2
+### 0.1.2 - 0.1.4
 Performance improvments.
 
 ### 0.1.1

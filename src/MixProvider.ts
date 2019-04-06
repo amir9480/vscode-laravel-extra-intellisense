@@ -5,22 +5,22 @@ import * as fs from 'fs';
 import Helpers from './helpers';
 
 
-export default class MixProvider {
-    mixes: Array<any> = [];
+export default class MixProvider implements vscode.CompletionItemProvider {
+    private mixes: Array<any> = [];
 
     constructor () {
         this.loadMix();
         setInterval(() => this.loadMix(), 60000);
     }
 
-    getItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, context: vscode.CompletionContext): Array<vscode.CompletionItem> {
-        var pos = document.offsetAt(position);
-        var func = Helpers.parseFunction(document.getText(), pos);
+    provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, context: vscode.CompletionContext): Array<vscode.CompletionItem> {
         var out:Array<vscode.CompletionItem> = [];
-        if (func &&
-            (context.triggerCharacter == '"' || context.triggerCharacter == "'" || func.parameters.length > 0) &&
-            (func.function.toLowerCase() == 'mix')
-        ) {
+        var func = Helpers.parseDocumentFunction(document, position);
+        if (func === null) {
+            return out;
+        }
+
+        if (func && (Helpers.tags.mix.functions.some((fn:string) => func.function.includes(fn)))) {
             for (var i in this.mixes) {
                 var completeItem = new vscode.CompletionItem(this.mixes[i], vscode.CompletionItemKind.Value);
                 completeItem.range = document.getWordRangeAtPosition(position, Helpers.wordMatchRegex);

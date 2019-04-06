@@ -9,6 +9,16 @@ export default class Helpers {
 
 	static wordMatchRegex = /[\w\d\-_\.\:\/]+/g;
 	static phpParser:any = null;
+	static cachedParseFunction:any = null;
+
+	static tags:any = {
+		config: {classes: ['Config']	, functions: ['config']},
+		mix: 	{classes: []			, functions: ['mix']},
+		route: 	{classes: ['Route']		, functions: ['route']},
+		trans: 	{classes: ['Lang']		, functions: ['__', 'trans', '@lang']},
+		view: 	{classes: ['View']		, functions: ['view', 'links', '@extends', '@component', '@include', '@each']},
+	};
+	static functionRegex: any = null;
 
 	/**
 	 * Create full path from project file name
@@ -100,25 +110,40 @@ export default class Helpers {
 	 * @param position
 	 */
 	static parseFunction(text: string, position: number, level: number = 0): any {
-		var funcsRegex = /((([A-Za-z0-9_]+)::)?([@A-Za-z0-9_]+)\()((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*)(\)|$)/g;
-		var paramsRegex = /((\s*\,\s*)?)(\[.*\]|array\(.*\)|(\"((\\\")|[^\"])*\")|(\'((\\\')|[^\'])*\'))/g;
+		var out:any = null;
+		var classes = [];
+		for(var i in Helpers.tags) {
+			for (var j in Helpers.tags[i].classes) {
+				classes.push(Helpers.tags[i].classes[j]);
+			}
+		}
+		// https://stackoverflow.com/a/35271017/5134885
+		var regexPattern = "(((" + classes.join('|') + ")::)?([@A-Za-z0-9_]+))((\\()((?:[^)(]+|\\((?:[^)(]+|\\([^)(]*\\))*\\))*)(\\)|$))";
+		for (var counter=0; counter < 12; counter++) {
+			regexPattern = regexPattern.replace("\\([^)(]*\\)", "\\((?:[^)(]+|\\([^)(]*\\))*(\\)|$)");
+		}
+		var functionRegex = new RegExp(regexPattern, "g");
+		var paramsRegex = /((\s*\,\s*)?)(\[.*(\]|$)|array\(.*(\)|$)|(\"((\\\")|[^\"])*(\"|$))|(\'((\\\')|[^\'])*(\'|$))|(\s+))/g;
 		var inlineFunctionMatch = /\((([\s\S]*\,)?\s*function\s*\(.*\)\s*\{)([\S\s]*)\}/g;
 
 		var match = null;
 		var match2 = null;
-		if (level < 6) {
-			while ((match = funcsRegex.exec(text)) !== null) {
+		if (Helpers.cachedParseFunction != null && Helpers.cachedParseFunction.text == text && position == Helpers.cachedParseFunction.position) {
+			out = Helpers.cachedParseFunction.out;
+		} else if (level < 6) {
+			while ((match = functionRegex.exec(text)) !== null) {
 				if (position >= match.index && position < match.index + match[0].length) {
-					if (match2 = inlineFunctionMatch.exec(match[0])) {
-						return this.parseFunction(match2[3], position - (match.index + match[1].length + match2[1].length), level + 1);
+					if ((match2 = inlineFunctionMatch.exec(match[0])) !== null) {
+						out = this.parseFunction(match2[3], position - (match.index + match[1].length + match[6].length + match2[1].length), level + 1);
 					} else {
 						var textParameters = [];
 						var paramIndex = null;
 						var paramIndexCounter = 0;
-						var paramsPosition = position - (match.index + match[1].length);
-						while ((match2 = paramsRegex.exec(match[5])) !== null) {
+						var paramsPosition = position - (match.index + match[1].length + match[6].length);
+
+						while ((match2 = paramsRegex.exec(match[7])) !== null) {
 							textParameters.push(match2[3]);
-							if (paramsPosition >= match2.index && paramsPosition < match2.index + match2[0].length) {
+							if (paramsPosition >= match2.index && paramsPosition <= match2.index + match2[0].length) {
 								paramIndex = paramIndexCounter;
 							}
 							paramIndexCounter++;
@@ -127,17 +152,25 @@ export default class Helpers {
 						for (var i in textParameters) {
 							functionParametrs.push(this.evalPhp(textParameters[i]));
 						}
-						return {
-							'class': match[3],
-							'function': match[4],
-							'paramIndex': paramIndex,
-							'parameters': functionParametrs,
-							'textParameters': textParameters
+						out = {
+							class: match[3],
+							function: match[4],
+							paramIndex: paramIndex,
+							parameters: functionParametrs,
+							textParameters: textParameters
 						};
+					}
+					if (level === 0) {
+						Helpers.cachedParseFunction = {text, position, out};
 					}
 				}
 			}
 		}
-		return null;
+		return out;
+	}
+
+	static parseDocumentFunction(document: vscode.TextDocument, position: vscode.Position) {
+        var pos = document.offsetAt(position);
+        return Helpers.parseFunction(document.getText(), pos);
 	}
 }

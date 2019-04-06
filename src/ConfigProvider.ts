@@ -4,21 +4,31 @@ import * as vscode from 'vscode';
 import Helpers from './helpers';
 
 
-export default class ConfigProvider {
-    configs: Array<any> = [];
+export default class ConfigProvider implements vscode.CompletionItemProvider {
+    private timer: any = null;
+    private configs: Array<any> = [];
 
     constructor () {
-        this.loadConfigs();
+        var self = this;
+        self.loadConfigs();
+        vscode.workspace.onDidSaveTextDocument(function(event: vscode.TextDocument) {
+            if (self.timer === null && event.fileName.toLowerCase().includes("config") && event.fileName.toLowerCase().includes("php")) {
+                self.timer = setTimeout(function () {
+                    self.loadConfigs();
+                    self.timer = null;
+                }, 2000);
+            }
+        });
     }
 
-    getItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, context: vscode.CompletionContext): Array<vscode.CompletionItem> {
-        var pos = document.offsetAt(position);
-        var func = Helpers.parseFunction(document.getText(), pos);
+    provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, context: vscode.CompletionContext): Array<vscode.CompletionItem> {
         var out:Array<vscode.CompletionItem> = [];
-        if (func &&
-            (context.triggerCharacter == '"' || context.triggerCharacter == "'" || func.parameters.length > 0) &&
-            ((func.class && func.class == 'Config') || func.function.toLowerCase() == 'config')
-        ) {
+        var func = Helpers.parseDocumentFunction(document, position);
+        if (func === null) {
+            return out;
+        }
+
+        if (func && ((func.class && Helpers.tags.config.classes.some((cls:string) => func.class.includes(cls))) || Helpers.tags.config.functions.some((fn:string) => func.function.includes(fn)))) {
             for (var i in this.configs) {
                 var completeItem = new vscode.CompletionItem(this.configs[i].name, vscode.CompletionItemKind.Value);
                 completeItem.range = document.getWordRangeAtPosition(position, Helpers.wordMatchRegex);
