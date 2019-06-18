@@ -13,7 +13,10 @@ export default class ViewProvider implements vscode.CompletionItemProvider {
         var self = this;
         self.loadViews();
         vscode.workspace.onDidSaveTextDocument(function(event: vscode.TextDocument) {
-            if (self.timer === null && event.fileName.toLowerCase().includes("config") && event.fileName.toLowerCase().includes("php")) {
+            if (event.fileName.toLowerCase().includes("config") && event.fileName.toLowerCase().includes("php")) {
+                if (self.timer) {
+                    clearTimeout(self.timer);
+                }
                 self.timer = setTimeout(function () {
                     self.loadViews();
                     self.timer = null;

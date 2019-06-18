@@ -7,7 +7,7 @@ import * as os from 'os';
 
 export default class Helpers {
 
-	static wordMatchRegex = /[\w\d\-_\.\:\/]+/g;
+	static wordMatchRegex = /[\w\d\-_\.\:\\\/]+/g;
 	static phpParser:any = null;
 	static cachedParseFunction:any = null;
 

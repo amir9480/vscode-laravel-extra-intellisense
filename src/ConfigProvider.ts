@@ -12,7 +12,10 @@ export default class ConfigProvider implements vscode.CompletionItemProvider {
         var self = this;
         self.loadConfigs();
         vscode.workspace.onDidSaveTextDocument(function(event: vscode.TextDocument) {
-            if (self.timer === null && event.fileName.toLowerCase().includes("config") && event.fileName.toLowerCase().includes("php")) {
+            if (event.fileName.toLowerCase().includes("config") && event.fileName.toLowerCase().includes("php")) {
+                if (self.timer != null) {
+                    clearTimeout(self.timer);
+                }
                 self.timer = setTimeout(function () {
                     self.loadConfigs();
                     self.timer = null;

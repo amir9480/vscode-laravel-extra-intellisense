@@ -13,7 +13,10 @@ export default class TranslationProvider implements vscode.CompletionItemProvide
         var self = this;
         setTimeout(() => self.loadTranslations(), 15000);
         vscode.workspace.onDidSaveTextDocument(function(event: vscode.TextDocument) {
-            if (self.timer === null && (event.fileName.toLowerCase().includes("lang") || event.fileName.toLowerCase().includes("trans") || event.fileName.toLowerCase().includes("localization"))) {
+            if (event.fileName.toLowerCase().includes("lang") || event.fileName.toLowerCase().includes("trans") || event.fileName.toLowerCase().includes("localization")) {
+                if (self.timer) {
+                    clearTimeout(self.timer);
+                }
                 self.timer = setTimeout(function () {
                     self.loadTranslations();
                     self.timer = null;
