@@ -14,6 +14,9 @@ This extension adds [laravel](https://laravel.com/) routes, views and ... autoco
 
 ## Release Notes
 
+### 0.1.5
+Route action autocomplete added. `Route::get`, `Route::post`,... autocompletes controller actions inside app\Http\Controllers.
+
 ### 0.1.2 - 0.1.4
 Performance improvments.
 
