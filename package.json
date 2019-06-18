@@ -2,7 +2,7 @@
 	"name": "laravel-extra-intellisense",
 	"displayName": "Laravel Extra Intellisense",
 	"description": "better intellisense for laravel projects.",
-	"version": "0.1.5",
+	"version": "0.1.6",
 	"publisher": "amiralizadeh9480",
 	"icon": "images/icon.png",
 	"engines": {
@@ -19,15 +19,13 @@
 		"type": "git",
 		"url": "https://github.com/amir9480/vscode-laravel-extra-intellisense"
 	},
-	"main": "./out/extension.js",
+	"main": "./dist/extension.js",
 	"contributes": {},
 	"scripts": {
 		"vscode:prepublish": "webpack --mode production",
 		"compile": "webpack --mode none",
 		"watch": "webpack --mode none --watch",
-		"postinstall": "node ./node_modules/vscode/bin/install",
-		"test": "npm run compile && node ./node_modules/vscode/bin/test",
-		"test-compile": "tsc -p ./"
+		"test": "tsc -p ./"
 	},
 	"dependencies": {
 		"php-parser": "^3.0.0-prerelease.8"
