@@ -47,8 +47,25 @@ export default class Helpers {
 	 */
 	static runLaravel(code: string) : string {
 		if (fs.existsSync(Helpers.projectPath("vendor/autoload.php")) && fs.existsSync(Helpers.projectPath("bootstrap/app.php"))) {
-			var command = "define('LARAVEL_START', microtime(true));require_once '" + Helpers.projectPath("vendor/autoload.php") + "'; require_once '" + Helpers.projectPath("bootstrap/app.php") + "';$kernel = $app->make(Illuminate\\Contracts\\Http\\Kernel::class);$response = $kernel->handle($request = Illuminate\\Http\\Request::capture());" + code;
-			return this.runPhp(command);
+			var command =
+				"define('LARAVEL_START', microtime(true));" +
+				"require_once '" + Helpers.projectPath("vendor/autoload.php") + "';" +
+				"require_once '" + Helpers.projectPath("bootstrap/app.php") + "';" +
+				"$kernel = $app->make(Illuminate\\Contracts\\Console\\Kernel::class);" +
+
+				"$status = $kernel->handle(" +
+					"$input = new Symfony\\Component\\Console\\Input\\ArgvInput," +
+					"new Symfony\\Component\\Console\\Output\\ConsoleOutput" +
+				");" +
+				"echo '___VSCODE_LARAVEL_EXTRA_INSTELLISENSE_OUTPUT___';" +
+				 code +
+				"echo '___VSCODE_LARAVEL_EXTRA_INSTELLISENSE_END_OUTPUT___';";
+
+			var out : any = this.runPhp(command);
+			out = /___VSCODE_LARAVEL_EXTRA_INSTELLISENSE_OUTPUT___(.*)___VSCODE_LARAVEL_EXTRA_INSTELLISENSE_END_OUTPUT___/g.exec(out);
+			if (out) {
+				return out[1];
+			}
 		}
 		return "";
 	}
