@@ -2,7 +2,7 @@
 	"name": "laravel-extra-intellisense",
 	"displayName": "Laravel Extra Intellisense",
 	"description": "better intellisense for laravel projects.",
-	"version": "0.1.7",
+	"version": "0.2.0",
 	"publisher": "amiralizadeh9480",
 	"icon": "images/icon.png",
 	"engines": {
@@ -20,7 +20,21 @@
 		"url": "https://github.com/amir9480/vscode-laravel-extra-intellisense"
 	},
 	"main": "./dist/extension.js",
-	"contributes": {},
+	"contributes": {
+		"configuration":[
+			{
+				"title": "Laravel Extra Intellisense",
+				"type": "object",
+				"properties": {
+					"LaravelExtraIntellisense.customValidationRules": {
+						"type": "object",
+						"default": {},
+						"description": "Custom validation rules snippets."
+					}
+				}
+			}
+		]
+	},
 	"scripts": {
 		"vscode:prepublish": "webpack --mode production",
 		"compile": "webpack --mode none",

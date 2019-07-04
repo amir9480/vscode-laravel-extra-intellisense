@@ -4,7 +4,6 @@ This extension adds [laravel](https://laravel.com/) routes, views and ... autoco
 
 ![Screen Shot](/images/screenshot.gif)
 
-
 ## Autocomplete
 * Route names and route parameters
 * Views
@@ -12,7 +11,23 @@ This extension adds [laravel](https://laravel.com/) routes, views and ... autoco
 * Translations and translation parameters
 * Laravel mix function
 
+## Configuration
+### LaravelExtraIntellisense.customValidationRules:
+Your custom validation rules snippets.
+
+Example:
+```json
+"LaravelExtraIntellisense.customValidationRules": {
+    "mobile": "mobile",
+    "distance_gt": "distance_gt:${0:1km}"
+}
+```
+
 ## Release Notes
+
+### 0.2.0
+Validation rules autocomplete added.
+works with `Validator` class, `validate` functions and inside request classes.
 
 ### 0.1.5
 Route action autocomplete added. `Route::get`, `Route::post`,... autocompletes controller actions inside app\Http\Controllers.

@@ -12,11 +12,12 @@ export default class Helpers {
 	static cachedParseFunction:any = null;
 
 	static tags:any = {
-		config: {classes: ['Config']	, functions: ['config']},
-		mix: 	{classes: []			, functions: ['mix']},
-		route: 	{classes: ['Route']		, functions: ['route']},
-		trans: 	{classes: ['Lang']		, functions: ['__', 'trans', '@lang']},
-		view: 	{classes: ['View']		, functions: ['view', 'links', '@extends', '@component', '@include', '@each']},
+		config: 	{classes: ['Config']	, functions: ['config']},
+		mix: 		{classes: []			, functions: ['mix']},
+		route: 		{classes: ['Route']		, functions: ['route']},
+		trans: 		{classes: ['Lang']		, functions: ['__', 'trans', '@lang']},
+		validation:	{classes: ['Validator'] , functions: ['validate', 'sometimes']},
+		view: 		{classes: ['View']		, functions: ['view', 'links', '@extends', '@component', '@include', '@each']},
 	};
 	static functionRegex: any = null;
 
