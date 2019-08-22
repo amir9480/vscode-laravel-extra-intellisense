@@ -17,7 +17,7 @@ export default class Helpers {
 		route: 		{classes: ['Route']		, functions: ['route']},
 		trans: 		{classes: ['Lang']		, functions: ['__', 'trans', '@lang']},
 		validation:	{classes: ['Validator'] , functions: ['validate', 'sometimes']},
-		view: 		{classes: ['View']		, functions: ['view', 'links', '@extends', '@component', '@include', '@each']},
+		view: 		{classes: ['View']		, functions: ['view', 'markdown', 'links', '@extends', '@component', '@include', '@each']},
 	};
 	static functionRegex: any = null;
 
