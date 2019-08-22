@@ -2,7 +2,7 @@
 	"name": "laravel-extra-intellisense",
 	"displayName": "Laravel Extra Intellisense",
 	"description": "better intellisense for laravel projects.",
-	"version": "0.2.0",
+	"version": "0.2.1",
 	"publisher": "amiralizadeh9480",
 	"icon": "images/icon.png",
 	"engines": {
@@ -21,7 +21,7 @@
 	},
 	"main": "./dist/extension.js",
 	"contributes": {
-		"configuration":[
+		"configuration": [
 			{
 				"title": "Laravel Extra Intellisense",
 				"type": "object",
