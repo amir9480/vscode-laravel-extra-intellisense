@@ -8,21 +8,17 @@ import Helpers from './helpers';
 export default class TranslationProvider implements vscode.CompletionItemProvider {
     private timer: any = null;
     private translations: Array<any> = [];
+    private watcher: any = null;
 
     constructor () {
         var self = this;
-        setTimeout(() => self.loadTranslations(), 15000);
-        vscode.workspace.onDidSaveTextDocument(function(event: vscode.TextDocument) {
-            if (event.fileName.toLowerCase().includes("lang") || event.fileName.toLowerCase().includes("trans") || event.fileName.toLowerCase().includes("localization")) {
-                if (self.timer) {
-                    clearTimeout(self.timer);
-                }
-                self.timer = setTimeout(function () {
-                    self.loadTranslations();
-                    self.timer = null;
-                }, 2000);
-            }
-        });
+        setTimeout(() => self.loadTranslations(), 10000);
+        if (vscode.workspace.workspaceFolders !== undefined) {
+            this.watcher = vscode.workspace.createFileSystemWatcher(new vscode.RelativePattern(vscode.workspace.workspaceFolders[0], "{,**/}{lang,localization,localizations,trans,translation,translations}/{*,**/*}"));
+            this.watcher.onDidChange((e: vscode.Uri) => this.onChange())
+            this.watcher.onDidCreate((e: vscode.Uri) => this.onChange());
+            this.watcher.onDidDelete((e: vscode.Uri) => this.onChange());
+        }
     }
 
     provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, context: vscode.CompletionContext): Array<vscode.CompletionItem> {
@@ -63,6 +59,17 @@ export default class TranslationProvider implements vscode.CompletionItemProvide
         return out;
     }
 
+    onChange() {
+        var self = this;
+        if (self.timer) {
+            clearTimeout(self.timer);
+        }
+        self.timer = setTimeout(function () {
+            self.loadTranslations();
+            self.timer = null;
+        }, 2000);
+    }
+
     loadTranslations () {
         var translations:Array<any> = [];
         try {
@@ -88,14 +95,18 @@ export default class TranslationProvider implements vscode.CompletionItemProvide
                 }
             }
             translationGroups = translationGroups.filter(function(item:any, index:any, array:any){ return array.indexOf(item) === index; });
-            translationGroups = JSON.parse(Helpers.runLaravel("echo json_encode([" + translationGroups.map((transGroup: string) => "'" + transGroup + "' => __('" + transGroup + "')").join(",") + "]);"))
+            translationGroups = JSON.parse(Helpers.runLaravel("echo json_encode([" + translationGroups.map((transGroup: string) => "'" + transGroup + "' => __('" + transGroup + "')").join(",") + "]);"));
             for(var i in translationGroups) {
                 translations = translations.concat(this.getTranslations(translationGroups[i], i));
             }
+            translations = translations.concat(this.getTranslations(JSON.parse(Helpers.runLaravel("echo json_encode(__('*'));")), '').map(function (transInfo) {
+                transInfo.name = transInfo.name.replace(/^\./, '');
+                return transInfo;
+            }));
             this.translations = translations;
         } catch (exception) {
             console.error(exception);
-            setTimeout(() => this.loadTranslations(), 20000);
+            this.onChange();
         }
     }
 

@@ -8,21 +8,17 @@ import Helpers from './helpers';
 export default class ViewProvider implements vscode.CompletionItemProvider {
     private timer: any = null;
     private views: Array<string> = [];
+    private watcher: any = null;
 
     constructor () {
         var self = this;
         self.loadViews();
-        vscode.workspace.onDidSaveTextDocument(function(event: vscode.TextDocument) {
-            if (event.fileName.toLowerCase().includes("config") && event.fileName.toLowerCase().includes("php")) {
-                if (self.timer) {
-                    clearTimeout(self.timer);
-                }
-                self.timer = setTimeout(function () {
-                    self.loadViews();
-                    self.timer = null;
-                }, 2000);
-            }
-        });
+
+        if (vscode.workspace.workspaceFolders !== undefined) {
+            this.watcher = vscode.workspace.createFileSystemWatcher(new vscode.RelativePattern(vscode.workspace.workspaceFolders[0], "{,**/}{view,views}/{*,**/*}"));
+            this.watcher.onDidCreate((e: vscode.Uri) => this.onChange());
+            this.watcher.onDidDelete((e: vscode.Uri) => this.onChange());
+        }
     }
 
     provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, context: vscode.CompletionContext): Array<vscode.CompletionItem> {
@@ -42,6 +38,17 @@ export default class ViewProvider implements vscode.CompletionItemProvider {
         return out;
     }
 
+    onChange() {
+        var self = this;
+        if (self.timer) {
+            clearTimeout(self.timer);
+        }
+        self.timer = setTimeout(function () {
+            self.loadViews();
+            self.timer = null;
+        }, 2000);
+    }
+
     loadViews () {
         try {
             var code = "echo json_encode(app('view')->getFinder()->getHints());";
@@ -58,7 +65,7 @@ export default class ViewProvider implements vscode.CompletionItemProvider {
             }
         } catch (exception) {
             console.error(exception);
-            setTimeout(() => this.loadViews(), 20000);
+            this.onChange();
         }
     }
 

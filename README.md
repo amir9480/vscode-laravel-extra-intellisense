@@ -25,6 +25,11 @@ Example:
 
 ## Release Notes
 
+### 0.2.1
+* `markdown` function added to view functions for autocomplete.
+* Using file watcher instead of save event. Better change detect for view autocomplete.
+* json translation autocomplete added.
+
 ### 0.2.0
 Validation rules autocomplete added.
 works with `Validator` class, `validate` functions and inside request classes.

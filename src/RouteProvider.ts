@@ -9,25 +9,19 @@ export default class RouteProvider implements vscode.CompletionItemProvider {
     private timer: any = null;
     private routes: Array<any> = [];
     private controllers: Array<any> = [];
+    private watcher: any = null;
+
 
     constructor () {
         var self = this;
         self.loadRoutes();
         self.loadControllers();
-        vscode.workspace.onDidSaveTextDocument(function(event: vscode.TextDocument) {
-            if (event.fileName.toLowerCase().includes("php") &&
-                (event.fileName.toLowerCase().includes("route") || event.fileName.toLowerCase().includes("controllers"))
-            ) {
-                if (self.timer != null) {
-                    clearTimeout(self.timer);
-                }
-                self.timer = setTimeout(function () {
-                    self.loadRoutes();
-                    self.loadControllers();
-                    self.timer = null;
-                }, 2000);
-            }
-        });
+        if (vscode.workspace.workspaceFolders !== undefined) {
+            this.watcher = vscode.workspace.createFileSystemWatcher(new vscode.RelativePattern(vscode.workspace.workspaceFolders[0], "{,**/}{Controllers,[Rr]oute}{,s}{.php,/*.php,/**/*.php}"));
+            this.watcher.onDidChange((e: vscode.Uri) => this.onChange())
+            this.watcher.onDidCreate((e: vscode.Uri) => this.onChange());
+            this.watcher.onDidDelete((e: vscode.Uri) => this.onChange());
+        }
     }
 
     provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, context: vscode.CompletionContext): Array<vscode.CompletionItem> {
@@ -83,6 +77,18 @@ export default class RouteProvider implements vscode.CompletionItemProvider {
         return out;
     }
 
+    onChange() {
+        var self = this;
+        if (self.timer != null) {
+            clearTimeout(self.timer);
+        }
+        self.timer = setTimeout(function () {
+            self.loadRoutes();
+            self.loadControllers();
+            self.timer = null;
+        }, 2000);
+    }
+
     loadRoutes() {
         if (vscode.workspace.workspaceFolders instanceof Array && vscode.workspace.workspaceFolders.length > 0) {
             try {
@@ -91,7 +97,7 @@ export default class RouteProvider implements vscode.CompletionItemProvider {
                 this.routes = routes;
             } catch (exception) {
                 console.error(exception);
-                setTimeout(() => this.loadRoutes(), 20000);
+                this.onChange();
             }
         }
     }
@@ -99,9 +105,10 @@ export default class RouteProvider implements vscode.CompletionItemProvider {
     loadControllers() {
         try {
             this.controllers = this.getControllers(Helpers.projectPath("app/Http/Controllers")).map((contoller) => contoller.replace(/@__invoke/, ''));
+            this.controllers = this.controllers.filter((v, i, a) => a.indexOf(v) === i);
         } catch (exception) {
             console.error(exception);
-            setTimeout(() => this.loadControllers(), 20000);
+            this.onChange();
         }
     }
 
@@ -119,13 +126,16 @@ export default class RouteProvider implements vscode.CompletionItemProvider {
                     if (file.includes(".php")) {
                         var controllerContent = fs.readFileSync(path + file, 'utf8');
                         var match = ((/class\s+([A-Za-z0-9_]+)\s+extends\s+.+/g).exec(controllerContent));
-                        var matchNamespace = ((/namespace .+\\Http\\Controllers\\([A-Za-z0-9_]*)/g).exec(controllerContent));
+                        var matchNamespace = ((/namespace .+\\Http\\Controllers\\?([A-Za-z0-9_]*)/g).exec(controllerContent));
                         var functionRegex = /public\s+function\s+([A-Za-z0-9_]+)\(.*\)/g;
                         if (match != null && matchNamespace) {
                             var className = match[1];
                             var namespace = matchNamespace[1];
                             while ((match = functionRegex.exec(controllerContent)) != null && match[1] != '__construct') {
-                                controllers.push(namespace + '\\' + className + '@' + match[1]);
+                                if (namespace.length > 0) {
+                                    controllers.push(namespace + '\\' + className + '@' + match[1]);
+                                }
+                                controllers.push(className + '@' + match[1]);
                             }
                         }
                     }

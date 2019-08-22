@@ -7,22 +7,20 @@ import Helpers from './helpers';
 export default class ConfigProvider implements vscode.CompletionItemProvider {
     private timer: any = null;
     private configs: Array<any> = [];
+    private watcher: any = null;
 
     constructor () {
         var self = this;
         self.loadConfigs();
-        vscode.workspace.onDidSaveTextDocument(function(event: vscode.TextDocument) {
-            if (event.fileName.toLowerCase().includes("config") && event.fileName.toLowerCase().includes("php")) {
-                if (self.timer != null) {
-                    clearTimeout(self.timer);
-                }
-                self.timer = setTimeout(function () {
-                    self.loadConfigs();
-                    self.timer = null;
-                }, 2000);
-            }
-        });
+        if (vscode.workspace.workspaceFolders !== undefined) {
+            this.watcher = vscode.workspace.createFileSystemWatcher(new vscode.RelativePattern(vscode.workspace.workspaceFolders[0], "config/{,*,**/*}.php"));
+            this.watcher.onDidChange((e: vscode.Uri) => this.onChange())
+            this.watcher.onDidCreate((e: vscode.Uri) => this.onChange());
+            this.watcher.onDidDelete((e: vscode.Uri) => this.onChange());
+        }
     }
+
+
 
     provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, context: vscode.CompletionContext): Array<vscode.CompletionItem> {
         var out:Array<vscode.CompletionItem> = [];
@@ -44,13 +42,24 @@ export default class ConfigProvider implements vscode.CompletionItemProvider {
         return out;
     }
 
+    onChange() {
+        var self = this;
+        if (self.timer != null) {
+            clearTimeout(self.timer);
+        }
+        self.timer = setTimeout(function () {
+            self.loadConfigs();
+            self.timer = null;
+        }, 2000);
+    }
+
     loadConfigs () {
         try {
             var configs = JSON.parse(Helpers.runLaravel("echo json_encode(config()->all());"));
             this.configs = this.getConfigs(configs);
         } catch (exception) {
             console.error(exception);
-            setTimeout(() => this.loadConfigs(), 20000);
+            this.onChange();
         }
     }
 
