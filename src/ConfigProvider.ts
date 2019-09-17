@@ -59,7 +59,6 @@ export default class ConfigProvider implements vscode.CompletionItemProvider {
             this.configs = this.getConfigs(configs);
         } catch (exception) {
             console.error(exception);
-            this.onChange();
         }
     }
 

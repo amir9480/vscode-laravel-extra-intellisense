@@ -106,7 +106,6 @@ export default class TranslationProvider implements vscode.CompletionItemProvide
             this.translations = translations;
         } catch (exception) {
             console.error(exception);
-            this.onChange();
         }
     }
 

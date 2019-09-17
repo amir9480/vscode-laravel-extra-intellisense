@@ -97,7 +97,6 @@ export default class RouteProvider implements vscode.CompletionItemProvider {
                 this.routes = routes;
             } catch (exception) {
                 console.error(exception);
-                this.onChange();
             }
         }
     }
@@ -108,7 +107,6 @@ export default class RouteProvider implements vscode.CompletionItemProvider {
             this.controllers = this.controllers.filter((v, i, a) => a.indexOf(v) === i);
         } catch (exception) {
             console.error(exception);
-            this.onChange();
         }
     }
 

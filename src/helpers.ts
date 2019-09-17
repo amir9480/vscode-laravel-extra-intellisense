@@ -51,7 +51,15 @@ export default class Helpers {
 			var command =
 				"define('LARAVEL_START', microtime(true));" +
 				"require_once '" + Helpers.projectPath("vendor/autoload.php") + "';" +
-				"require_once '" + Helpers.projectPath("bootstrap/app.php") + "';" +
+				"$app = require_once '" + Helpers.projectPath("bootstrap/app.php") + "';" +
+				"class VscodeLaravelExtraIntellisenseProvider extends \\Illuminate\\Support\\ServiceProvider" +
+				"{" +
+				"	public function boot()" +
+				"	{" +
+				"		$this->app['log']->setHandlers([new \\Monolog\\Handler\\NullHandler()]);" +
+				"	}" +
+				"}" +
+				"$app->register(new VscodeLaravelExtraIntellisenseProvider($app));" +
 				"$kernel = $app->make(Illuminate\\Contracts\\Console\\Kernel::class);" +
 
 				"$status = $kernel->handle(" +

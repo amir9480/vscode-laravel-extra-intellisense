@@ -65,7 +65,6 @@ export default class ViewProvider implements vscode.CompletionItemProvider {
             }
         } catch (exception) {
             console.error(exception);
-            this.onChange();
         }
     }
 

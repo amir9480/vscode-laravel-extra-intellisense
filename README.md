@@ -25,6 +25,10 @@ Example:
 
 ## Release Notes
 
+### 0.2.2
+* Auto-Retry removed from all providers. causes some performance issues.
+* Disable logging added.
+
 ### 0.2.1
 * `markdown` function added to view functions for autocomplete.
 * Using file watcher instead of save event. Better change detect for view autocomplete.
