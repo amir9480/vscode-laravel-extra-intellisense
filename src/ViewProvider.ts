@@ -7,7 +7,7 @@ import Helpers from './helpers';
 
 export default class ViewProvider implements vscode.CompletionItemProvider {
     private timer: any = null;
-    private views: Array<string> = [];
+    private views: {[key:string]: string} = {};
     private watcher: any = null;
 
     constructor () {
@@ -29,10 +29,26 @@ export default class ViewProvider implements vscode.CompletionItemProvider {
         }
 
         if (func && ((func.class && Helpers.tags.view.classes.some((cls:string) => func.class.includes(cls))) || Helpers.tags.view.functions.some((fn:string) => func.function.includes(fn)))) {
-            for (var i in this.views) {
-                var compeleteItem = new vscode.CompletionItem(this.views[i], vscode.CompletionItemKind.Constant);
-                compeleteItem.range = document.getWordRangeAtPosition(position, Helpers.wordMatchRegex);
-                out.push(compeleteItem);
+            if (func.paramIndex == 0) {
+                for (var i in this.views) {
+                    var compeleteItem = new vscode.CompletionItem(i, vscode.CompletionItemKind.Constant);
+                    compeleteItem.range = document.getWordRangeAtPosition(position, Helpers.wordMatchRegex);
+                    out.push(compeleteItem);
+                }
+            } else if (typeof this.views[func.parameters[0]] !== 'undefined') {
+                var viewContent = fs.readFileSync(this.views[func.parameters[0]], 'utf8');
+                var variableRegex = /\$([A-Za-z_][A-Za-z0-9_]*)/g;
+                var r:any = [];
+                var variableNames = [];
+                while (r = variableRegex.exec(viewContent)) {
+                    variableNames.push(r[1]);
+                }
+                variableNames = variableNames.filter((v, i, a) => a.indexOf(v) === i);
+                for (var i in variableNames) {
+                    var compeleteItem = new vscode.CompletionItem(variableNames[i], vscode.CompletionItemKind.Constant);
+                    compeleteItem.range = document.getWordRangeAtPosition(position, Helpers.wordMatchRegex);
+                    out.push(compeleteItem);
+                }
             }
         }
         return out;
@@ -54,13 +70,16 @@ export default class ViewProvider implements vscode.CompletionItemProvider {
             var code = "echo json_encode(app('view')->getFinder()->getHints());";
             var viewPaths = JSON.parse(Helpers.runLaravel(code.replace("getHints", "getPaths")));
             var viewNamespaces = JSON.parse(Helpers.runLaravel(code));
-            this.views = [];
+            this.views = {};
             for (var i in viewPaths) {
-                this.views = this.views.concat(this.getViews(viewPaths[i]));
+                this.views = Object.assign(this.views, this.getViews(viewPaths[i]));
             }
             for (var i in viewNamespaces) {
                 for (var j in viewNamespaces[i]) {
-                    this.views = this.views.concat(this.getViews(viewNamespaces[i][j]).map((view) => i + "::" + view));
+                    var viewsInNamespace = this.getViews(viewNamespaces[i][j]);
+                    for (var k in viewsInNamespace) {
+                        this.views[i + "::" + k] = viewNamespaces[k];
+                    }
                 }
             }
         } catch (exception) {
@@ -68,19 +87,22 @@ export default class ViewProvider implements vscode.CompletionItemProvider {
         }
     }
 
-    getViews(path: string): Array<string> {
+    getViews(path: string): {[key:string]: string} {
         if (path.substr(-1) != '/' && path.substr(-1) != '\\') {
             path += "/";
         }
-        var out: Array<string> = [];
+        var out: {[key:string]: string} = {};
         var self = this;
         if (fs.existsSync(path) && fs.lstatSync(path).isDirectory()) {
             fs.readdirSync(path).forEach(function (file) {
                 if (fs.lstatSync(path+file).isDirectory()) {
-                    out = out.concat(self.getViews(path + file + "/").map((fn) => file + "." + fn));
+                    var viewsInDirectory = self.getViews(path + file + "/");
+                    for (var i in viewsInDirectory) {
+                        out[file + "." + i] = viewsInDirectory[i];
+                    }
                 } else {
                     if (file.includes("blade.php")) {
-                        out.push(file.replace(".blade.php", ""));
+                        out[file.replace(".blade.php", "")] = path + file;
                     }
                 }
             });

@@ -25,6 +25,10 @@ Example:
 
 ## Release Notes
 
+### 0.2.3
+* View parameters auto complete
+* Route autocomplete bug in linux fixed.
+
 ### 0.2.2
 * Auto-Retry removed from all providers. causes some performance issues.
 * Disable logging added.

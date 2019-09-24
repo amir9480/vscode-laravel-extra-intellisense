@@ -16,7 +16,7 @@ export default class Helpers {
 		mix: 		{classes: []			, functions: ['mix']},
 		route: 		{classes: ['Route']		, functions: ['route']},
 		trans: 		{classes: ['Lang']		, functions: ['__', 'trans', '@lang']},
-		validation:	{classes: ['Validator'] , functions: ['validate', 'sometimes']},
+		validation:	{classes: ['Validator'] , functions: ['validate', 'sometimes', 'rules']},
 		view: 		{classes: ['View']		, functions: ['view', 'markdown', 'links', '@extends', '@component', '@include', '@each']},
 	};
 	static functionRegex: any = null;
@@ -88,6 +88,8 @@ export default class Helpers {
 		code = code.replace(/\"/g, "\\\"");
 		if (['linux', 'openbsd', 'sunos', 'darwin'].some(unixPlatforms => os.platform().includes(unixPlatforms))) {
 			code = code.replace(/\$/g, "\\$");
+			code = code.replace(/\\\\'/g, '\\\\\\\\\'');
+			code = code.replace(/\\\\"/g, '\\\\\\\\\"');
 		}
 		var command = "php -r \"" + code + "\"";
 		return cp.execSync(command).toString();
