@@ -10,6 +10,8 @@ This extension adds [laravel](https://laravel.com/) routes, views and ... autoco
 * Configs
 * Translations and translation parameters
 * Laravel mix function
+* Validation rules
+* View sections
 
 ## Configuration
 ### LaravelExtraIntellisense.customValidationRules:
@@ -25,8 +27,11 @@ Example:
 
 ## Release Notes
 
+### 0.2.4
+* Blade section autocomplete added.
+
 ### 0.2.3
-* View parameters auto complete
+* View parameters autocomplete.
 * Route autocomplete bug in linux fixed.
 
 ### 0.2.2

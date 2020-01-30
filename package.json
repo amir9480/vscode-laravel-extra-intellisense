@@ -19,7 +19,7 @@
 		"type": "git",
 		"url": "https://github.com/amir9480/vscode-laravel-extra-intellisense"
 	},
-	"main": "./dist/extension.js",
+	"main": "./out/extension.js",
 	"contributes": {
 		"configuration": [
 			{
@@ -37,21 +37,21 @@
 	},
 	"scripts": {
 		"vscode:prepublish": "webpack --mode production",
-		"compile": "webpack --mode none",
-		"watch": "webpack --mode none --watch",
+		"compile": "webpack --mode development",
+		"watch": "webpack --mode development --watch",
 		"test": "tsc -p ./"
 	},
 	"dependencies": {
 		"php-parser": "^3.0.0-prerelease.9"
 	},
 	"devDependencies": {
-		"@types/mocha": "^5.2.7",
-		"@types/node": "^12.7.5",
-		"ts-loader": "^6.1.0",
-		"tslint": "^5.20.0",
-		"typescript": "^3.6.3",
+		"@types/mocha": "^7.0.1",
+		"@types/node": "^13.5.2",
+		"ts-loader": "^6.2.1",
+		"tslint": "^6.0.0",
+		"typescript": "^3.7.5",
 		"vscode": "^1.1.36",
-		"webpack": "^4.40.2",
-		"webpack-cli": "^3.3.9"
+		"webpack": "^4.41.5",
+		"webpack-cli": "^3.3.10"
 	}
 }

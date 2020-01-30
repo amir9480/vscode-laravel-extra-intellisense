@@ -4,7 +4,8 @@
 // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
 {
 	"version": "0.2.0",
-	"configurations": [{
+	"configurations": [
+		{
 			"name": "Run Extension",
 			"type": "extensionHost",
 			"request": "launch",
@@ -13,9 +14,8 @@
 				"--extensionDevelopmentPath=${workspaceFolder}"
 			],
 			"outFiles": [
-				"${workspaceFolder}/dist/**/*.js"
-			],
-			"preLaunchTask": "npm: watch"
+				"${workspaceFolder}/out/*.js"
+			]
 		},
 		{
 			"name": "Extension Tests",
@@ -24,12 +24,11 @@
 			"runtimeExecutable": "${execPath}",
 			"args": [
 				"--extensionDevelopmentPath=${workspaceFolder}",
-				"--extensionTestsPath=${workspaceFolder}/dist/test"
+				"--extensionTestsPath=${workspaceFolder}/out/test"
 			],
 			"outFiles": [
-				"${workspaceFolder}/dist/test/**/*.js"
-			],
-			"preLaunchTask": "npm: watch"
+				"${workspaceFolder}/out/test/*.js"
+			]
 		}
 	]
 }

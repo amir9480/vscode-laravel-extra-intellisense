@@ -4,7 +4,6 @@ import * as vscode from 'vscode';
 import * as fs from "fs";
 import Helpers from './helpers';
 
-
 export default class ViewProvider implements vscode.CompletionItemProvider {
     private timer: any = null;
     private views: {[key:string]: string} = {};
@@ -48,6 +47,24 @@ export default class ViewProvider implements vscode.CompletionItemProvider {
                     var compeleteItem = new vscode.CompletionItem(variableNames[i], vscode.CompletionItemKind.Constant);
                     compeleteItem.range = document.getWordRangeAtPosition(position, Helpers.wordMatchRegex);
                     out.push(compeleteItem);
+                }
+            }
+        } else if (func && func.function == '@section') {
+            var extendsRegex = /@extends\s*\([\'\"](.+)[\'\"]\)/g;
+            var regexResult:any = [];
+            if (regexResult = extendsRegex.exec(document.getText())) {
+                if (typeof this.views[regexResult[1]] !== 'undefined') {
+                    var parentContent = fs.readFileSync(this.views[regexResult[1]], 'utf8');
+                    var yieldRegex = /@yield\s*\([\'\"]([A-Za-z0-9_\-\.]+)[\'\"](,.*)?\)/g;
+                    var yeildNames = [];
+                    while (regexResult = yieldRegex.exec(parentContent)) {
+                        yeildNames.push(regexResult[1]);
+                    }
+                    for (var i in yeildNames) {
+                        var compeleteItem = new vscode.CompletionItem(yeildNames[i], vscode.CompletionItemKind.Constant);
+                        compeleteItem.range = document.getWordRangeAtPosition(position, Helpers.wordMatchRegex);
+                        out.push(compeleteItem);
+                    }
                 }
             }
         }
