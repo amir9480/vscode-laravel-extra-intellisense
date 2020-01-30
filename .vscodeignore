@@ -1,6 +1,5 @@
 .vscode/**
 .vscode-test/**
-out/**
 src/**
 images/screenshot.gif
 .gitignore
