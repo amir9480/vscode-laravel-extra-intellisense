@@ -12,7 +12,6 @@ export default class ViewProvider implements vscode.CompletionItemProvider {
     constructor () {
         var self = this;
         self.loadViews();
-
         if (vscode.workspace.workspaceFolders !== undefined) {
             this.watcher = vscode.workspace.createFileSystemWatcher(new vscode.RelativePattern(vscode.workspace.workspaceFolders[0], "{,**/}{view,views}/{*,**/*}"));
             this.watcher.onDidCreate((e: vscode.Uri) => this.onChange());
@@ -28,8 +27,8 @@ export default class ViewProvider implements vscode.CompletionItemProvider {
         }
 
         if (func && ((func.class && Helpers.tags.view.classes.some((cls:string) => func.class.includes(cls))) || Helpers.tags.view.functions.some((fn:string) => func.function.includes(fn)))) {
-            if (func.paramIndex == 0) {
-                for (var i in this.views) {
+            if (func.paramIndex === 0) {
+                for (let i in this.views) {
                     var compeleteItem = new vscode.CompletionItem(i, vscode.CompletionItemKind.Constant);
                     compeleteItem.range = document.getWordRangeAtPosition(position, Helpers.wordMatchRegex);
                     out.push(compeleteItem);
@@ -43,27 +42,31 @@ export default class ViewProvider implements vscode.CompletionItemProvider {
                     variableNames.push(r[1]);
                 }
                 variableNames = variableNames.filter((v, i, a) => a.indexOf(v) === i);
-                for (var i in variableNames) {
-                    var compeleteItem = new vscode.CompletionItem(variableNames[i], vscode.CompletionItemKind.Constant);
-                    compeleteItem.range = document.getWordRangeAtPosition(position, Helpers.wordMatchRegex);
-                    out.push(compeleteItem);
+                for (let i in variableNames) {
+                    var variableCompeleteItem = new vscode.CompletionItem(variableNames[i], vscode.CompletionItemKind.Constant);
+                    variableCompeleteItem.range = document.getWordRangeAtPosition(position, Helpers.wordMatchRegex);
+                    out.push(variableCompeleteItem);
                 }
             }
-        } else if (func && func.function == '@section') {
+        } else if (func && (func.function === '@section' || func.function === '@push')) {
             var extendsRegex = /@extends\s*\([\'\"](.+)[\'\"]\)/g;
             var regexResult:any = [];
             if (regexResult = extendsRegex.exec(document.getText())) {
                 if (typeof this.views[regexResult[1]] !== 'undefined') {
                     var parentContent = fs.readFileSync(this.views[regexResult[1]], 'utf8');
                     var yieldRegex = /@yield\s*\([\'\"]([A-Za-z0-9_\-\.]+)[\'\"](,.*)?\)/g;
+                    if (func.function === '@push') {
+                        yieldRegex = /@stack\s*\([\'\"]([A-Za-z0-9_\-\.]+)[\'\"](,.*)?\)/g;
+                    }
                     var yeildNames = [];
                     while (regexResult = yieldRegex.exec(parentContent)) {
                         yeildNames.push(regexResult[1]);
                     }
+                    yeildNames = yeildNames.filter((v, i, a) => a.indexOf(v) === i);
                     for (var i in yeildNames) {
-                        var compeleteItem = new vscode.CompletionItem(yeildNames[i], vscode.CompletionItemKind.Constant);
-                        compeleteItem.range = document.getWordRangeAtPosition(position, Helpers.wordMatchRegex);
-                        out.push(compeleteItem);
+                        var yieldCompeleteItem = new vscode.CompletionItem(yeildNames[i], vscode.CompletionItemKind.Constant);
+                        yieldCompeleteItem.range = document.getWordRangeAtPosition(position, Helpers.wordMatchRegex);
+                        out.push(yieldCompeleteItem);
                     }
                 }
             }
@@ -79,33 +82,41 @@ export default class ViewProvider implements vscode.CompletionItemProvider {
         self.timer = setTimeout(function () {
             self.loadViews();
             self.timer = null;
-        }, 2000);
+        }, 5000);
     }
 
     loadViews () {
         try {
+            var self = this;
             var code = "echo json_encode(app('view')->getFinder()->getHints());";
-            var viewPaths = JSON.parse(Helpers.runLaravel(code.replace("getHints", "getPaths")));
-            var viewNamespaces = JSON.parse(Helpers.runLaravel(code));
-            this.views = {};
-            for (var i in viewPaths) {
-                this.views = Object.assign(this.views, this.getViews(viewPaths[i]));
-            }
-            for (var i in viewNamespaces) {
-                for (var j in viewNamespaces[i]) {
-                    var viewsInNamespace = this.getViews(viewNamespaces[i][j]);
-                    for (var k in viewsInNamespace) {
-                        this.views[i + "::" + k] = viewNamespaces[k];
-                    }
-                }
-            }
+            Helpers.runLaravel(code.replace("getHints", "getPaths"))
+                .then(function (viewPathsResult) {
+                    var viewPaths = JSON.parse(viewPathsResult);
+                    Helpers.runLaravel(code)
+                        .then(function (viewNamespacesResult) {
+                            var viewNamespaces = JSON.parse(viewNamespacesResult);
+                            let views:any = {};
+                            for (let i in viewPaths) {
+                                views = Object.assign(views, self.getViews(viewPaths[i]));
+                            }
+                            for (let i in viewNamespaces) {
+                                for (var j in viewNamespaces[i]) {
+                                    var viewsInNamespace = self.getViews(viewNamespaces[i][j]);
+                                    for (var k in viewsInNamespace) {
+                                        views[i + "::" + k] = viewNamespaces[k];
+                                    }
+                                }
+                            }
+                            self.views = views;
+                        });
+                });
         } catch (exception) {
             console.error(exception);
         }
     }
 
     getViews(path: string): {[key:string]: string} {
-        if (path.substr(-1) != '/' && path.substr(-1) != '\\') {
+        if (path.substr(-1) !== '/' && path.substr(-1) !== '\\') {
             path += "/";
         }
         var out: {[key:string]: string} = {};

@@ -27,6 +27,11 @@ Example:
 
 ## Release Notes
 
+### 0.2.6
+* Blade stack autocomplete added.
+* Duplicate section autocomplete items fixed.
+* PHP commands converted to async functions to prevent unresponsive extension host error.
+
 ### 0.2.4
 * Blade section autocomplete added.
 

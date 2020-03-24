@@ -14,7 +14,7 @@ export default class ConfigProvider implements vscode.CompletionItemProvider {
         self.loadConfigs();
         if (vscode.workspace.workspaceFolders !== undefined) {
             this.watcher = vscode.workspace.createFileSystemWatcher(new vscode.RelativePattern(vscode.workspace.workspaceFolders[0], "config/{,*,**/*}.php"));
-            this.watcher.onDidChange((e: vscode.Uri) => this.onChange())
+            this.watcher.onDidChange((e: vscode.Uri) => this.onChange());
             this.watcher.onDidCreate((e: vscode.Uri) => this.onChange());
             this.watcher.onDidDelete((e: vscode.Uri) => this.onChange());
         }
@@ -44,19 +44,23 @@ export default class ConfigProvider implements vscode.CompletionItemProvider {
 
     onChange() {
         var self = this;
-        if (self.timer != null) {
+        if (self.timer !== null) {
             clearTimeout(self.timer);
         }
         self.timer = setTimeout(function () {
             self.loadConfigs();
             self.timer = null;
-        }, 2000);
+        }, 5000);
     }
 
     loadConfigs () {
         try {
-            var configs = JSON.parse(Helpers.runLaravel("echo json_encode(config()->all());"));
-            this.configs = this.getConfigs(configs);
+            var self = this;
+            Helpers.runLaravel("echo json_encode(config()->all());")
+                .then(function (result) {
+                    var configs = JSON.parse(result);
+                    self.configs = self.getConfigs(configs);
+                });
         } catch (exception) {
             console.error(exception);
         }

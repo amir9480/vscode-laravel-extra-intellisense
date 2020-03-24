@@ -28,7 +28,7 @@ export default class Helpers {
 	 * @param string
 	 */
 	static projectPath(path:string) : string {
-		if (path[0] != '/') {
+		if (path[0] !== '/') {
 			path = '/' + path;
 		}
 		if (vscode.workspace.workspaceFolders instanceof Array && vscode.workspace.workspaceFolders.length > 0) {
@@ -46,7 +46,7 @@ export default class Helpers {
 	 *
 	 * @param code
 	 */
-	static runLaravel(code: string) : string {
+	static async runLaravel(code: string) : Promise<string> {
 		if (fs.existsSync(Helpers.projectPath("vendor/autoload.php")) && fs.existsSync(Helpers.projectPath("bootstrap/app.php"))) {
 			var command =
 				"define('LARAVEL_START', microtime(true));" +
@@ -70,7 +70,7 @@ export default class Helpers {
 				 code +
 				"echo '___VSCODE_LARAVEL_EXTRA_INSTELLISENSE_END_OUTPUT___';";
 
-			var out : any = this.runPhp(command);
+			var out : string | null | RegExpExecArray = await this.runPhp(command);
 			out = /___VSCODE_LARAVEL_EXTRA_INSTELLISENSE_OUTPUT___(.*)___VSCODE_LARAVEL_EXTRA_INSTELLISENSE_END_OUTPUT___/g.exec(out);
 			if (out) {
 				return out[1];
@@ -84,7 +84,7 @@ export default class Helpers {
 	 *
 	 * @param code
 	 */
-	static runPhp(code: string) : string {
+	static async runPhp(code: string) : Promise<string> {
 		code = code.replace(/\"/g, "\\\"");
 		if (['linux', 'openbsd', 'sunos', 'darwin'].some(unixPlatforms => os.platform().includes(unixPlatforms))) {
 			code = code.replace(/\$/g, "\\$");
@@ -92,7 +92,16 @@ export default class Helpers {
 			code = code.replace(/\\\\"/g, '\\\\\\\\\"');
 		}
 		var command = "php -r \"" + code + "\"";
-		return cp.execSync(command).toString();
+		let out = new Promise<string>(function (resolve, error) {
+			cp.exec(command, function (err, stdout, stderr) {
+				if (stdout.length > 0) {
+					resolve(stdout);
+				} else {
+					error(stderr);
+				}
+			});
+		});
+		return out;
 	}
 
 	/**
@@ -140,14 +149,14 @@ export default class Helpers {
 	static parseFunction(text: string, position: number, level: number = 0): any {
 		var out:any = null;
 		var classes = [];
-		for(var i in Helpers.tags) {
-			for (var j in Helpers.tags[i].classes) {
+		for(let i in Helpers.tags) {
+			for (let j in Helpers.tags[i].classes) {
 				classes.push(Helpers.tags[i].classes[j]);
 			}
 		}
 		// https://stackoverflow.com/a/35271017/5134885
 		var regexPattern = "(((" + classes.join('|') + ")::)?([@A-Za-z0-9_]+))((\\()((?:[^)(]+|\\((?:[^)(]+|\\([^)(]*\\))*\\))*)(\\)|$))";
-		for (var counter=0; counter < 12; counter++) {
+		for (let counter=0; counter < 12; counter++) {
 			regexPattern = regexPattern.replace("\\([^)(]*\\)", "\\((?:[^)(]+|\\([^)(]*\\))*(\\)|$)");
 		}
 		var functionRegex = new RegExp(regexPattern, "g");
@@ -156,7 +165,7 @@ export default class Helpers {
 
 		var match = null;
 		var match2 = null;
-		if (Helpers.cachedParseFunction != null && Helpers.cachedParseFunction.text == text && position == Helpers.cachedParseFunction.position) {
+		if (Helpers.cachedParseFunction !== null && Helpers.cachedParseFunction.text === text && position === Helpers.cachedParseFunction.position) {
 			out = Helpers.cachedParseFunction.out;
 		} else if (level < 6) {
 			while ((match = functionRegex.exec(text)) !== null) {
@@ -177,7 +186,7 @@ export default class Helpers {
 							paramIndexCounter++;
 						}
 						var functionParametrs = [];
-						for (var i in textParameters) {
+						for (let i in textParameters) {
 							functionParametrs.push(this.evalPhp(textParameters[i]));
 						}
 						out = {

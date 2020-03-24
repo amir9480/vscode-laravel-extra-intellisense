@@ -14,6 +14,7 @@ import ValidationProvider from './ValidationProvider';
 
 
 export function activate(context: vscode.ExtensionContext) {
+	showWelcomeMessage(context);
 	if (vscode.workspace.workspaceFolders instanceof Array && vscode.workspace.workspaceFolders.length > 0) {
 		if (fs.existsSync(Helpers.projectPath("artisan"))) {
 			const LANGUAGES =
@@ -33,3 +34,35 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	}
 }
+
+export function deactivate() {}
+
+function showWelcomeMessage(context: vscode.ExtensionContext) {
+	let previousVersion = context.globalState.get<string>('laravel-extra-intellisense-version');
+	let currentVersion = vscode.extensions.getExtension('amiralizadeh9480.laravel-extra-intellisense')?.packageJSON?.version;
+	let message : string | null = null;
+	let previousVersionArray = previousVersion ? previousVersion.split('.').map((s: string) => Number(s)) : [0, 0, 0];
+	let currentVersionArray = currentVersion.split('.').map((s: string) => Number(s));
+	if (previousVersion === undefined || previousVersion.length === 0) {
+		message = "Thanks for using Laravel Extra Intellisense.";
+	} else if (currentVersion !== previousVersion && (
+		(previousVersionArray[0] === currentVersionArray[0] && previousVersionArray[1] === currentVersionArray[1] && previousVersionArray[2] < currentVersionArray[2]) ||
+		(previousVersionArray[0] === currentVersionArray[0] && previousVersionArray[1] < currentVersionArray[1]) ||
+		(previousVersionArray[0] < currentVersionArray[0])
+	)
+	) {
+		message = "Laravel Extra Intellisense updated to " + currentVersion;
+	}
+	if (message) {
+		vscode.window.showInformationMessage(message, '⭐️ Rate', '🐞 Report Bug')
+			.then(function (val: string | undefined) {
+				if (val === '⭐️ Rate') {
+					vscode.env.openExternal(vscode.Uri.parse('https://marketplace.visualstudio.com/items?itemName=amiralizadeh9480.laravel-extra-intellisense'));
+				} else if (val === '🐞 Report Bug') {
+					vscode.env.openExternal(vscode.Uri.parse('https://github.com/amir9480/vscode-laravel-extra-intellisense/issues'));
+				}
+			});
+		context.globalState.update('laravel-extra-intellisense-version', currentVersion);
+	}
+}
+
