@@ -27,7 +27,7 @@ Example:
 ```
 
 ## Other products
-![Laravel Sanjab](/images/sanjab-banner.jpg)
+[![Laravel Sanjab](/images/sanjab-banner.jpg)](https://github.com/sanjabteam/sanjab)
 
 If you want to create admin panels for Laravel quick and easy checkout [Sanjab](https://github.com/sanjabteam/sanjab) package. It is also free.
 
