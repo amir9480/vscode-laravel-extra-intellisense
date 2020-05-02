@@ -18,6 +18,7 @@ export default class Helpers {
 		trans: 		{classes: ['Lang']		, functions: ['__', 'trans', '@lang']},
 		validation:	{classes: ['Validator'] , functions: ['validate', 'sometimes', 'rules']},
 		view: 		{classes: ['View']		, functions: ['view', 'markdown', 'links', '@extends', '@component', '@include', '@each']},
+		env: 		{classes: []			, functions: ['env']},
 	};
 	static functionRegex: any = null;
 

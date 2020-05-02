@@ -20,8 +20,6 @@ export default class ConfigProvider implements vscode.CompletionItemProvider {
         }
     }
 
-
-
     provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, context: vscode.CompletionContext): Array<vscode.CompletionItem> {
         var out:Array<vscode.CompletionItem> = [];
         var func = Helpers.parseDocumentFunction(document, position);

@@ -1,6 +1,6 @@
-# Laravel Extra Intellisense
+<h1 align="center">Laravel Extra Intellisense</h1>
 
-This extension adds [laravel](https://laravel.com/) routes, views and ... autocomplete to [VSCode](https://code.visualstudio.com/).
+This extension provides [Laravel](https://laravel.com/) routes, views and ... autocomplete for [VSCode](https://code.visualstudio.com/).
 
 ![Screen Shot](/images/screenshot.gif)
 
@@ -12,6 +12,7 @@ This extension adds [laravel](https://laravel.com/) routes, views and ... autoco
 * Laravel mix function
 * Validation rules
 * View sections
+* Env
 
 ## Configuration
 ### LaravelExtraIntellisense.customValidationRules:
@@ -24,6 +25,11 @@ Example:
     "distance_gt": "distance_gt:${0:1km}"
 }
 ```
+
+## Other products
+![Laravel Sanjab](/images/sanjab-banner.jpg)
+If you want to create admin panels for Laravel quick and easy checkout [Sanjab](https://github.com/sanjabteam/sanjab) package. It is also free.
+
 
 ## Release Notes
 

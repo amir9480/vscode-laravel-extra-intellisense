@@ -32,7 +32,7 @@ export default class MixProvider implements vscode.CompletionItemProvider {
 
     loadMix() {
         try {
-            if (fs.existsSync(Helpers.projectPath("public/mix-manifest.json")) && fs.existsSync(Helpers.projectPath("public/mix-manifest.json"))) {
+            if (fs.existsSync(Helpers.projectPath("public/mix-manifest.json"))) {
                 var mixes = JSON.parse(fs.readFileSync(Helpers.projectPath('public/mix-manifest.json'), 'utf8'));
                 this.mixes = Object.keys(mixes).map((mixFile) => mixFile.replace(/^\//g, ''));
             }
