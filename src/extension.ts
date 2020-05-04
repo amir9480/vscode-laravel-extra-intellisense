@@ -55,15 +55,17 @@ function showWelcomeMessage(context: vscode.ExtensionContext) {
 		(previousVersionArray[0] < currentVersionArray[0])
 	)
 	) {
-		message = "Laravel Extra Intellisense updated to " + currentVersion;
+		message = "Laravel Extra Intellisense updated to " + currentVersion + ". New features: env and route middleware autocomplete.";
 	}
 	if (message) {
-		vscode.window.showInformationMessage(message, '⭐️ Rate', '🐞 Report Bug')
+		vscode.window.showInformationMessage(message, '⭐️ Star on Github', '🐞 Report Bug')
 			.then(function (val: string | undefined) {
 				if (val === '⭐️ Rate') {
 					vscode.env.openExternal(vscode.Uri.parse('https://marketplace.visualstudio.com/items?itemName=amiralizadeh9480.laravel-extra-intellisense'));
 				} else if (val === '🐞 Report Bug') {
 					vscode.env.openExternal(vscode.Uri.parse('https://github.com/amir9480/vscode-laravel-extra-intellisense/issues'));
+				} else if (val === '⭐️ Star on Github') {
+					vscode.env.openExternal(vscode.Uri.parse('https://github.com/amir9480/vscode-laravel-extra-intellisense#other-products'));
 				}
 			});
 		context.globalState.update('laravel-extra-intellisense-version', currentVersion);

@@ -6,12 +6,12 @@ This extension provides [Laravel](https://laravel.com/) routes, views and ... au
 
 ## Autocomplete
 * Route names and route parameters
-* Views
+* Views and variables
 * Configs
 * Translations and translation parameters
 * Laravel mix function
 * Validation rules
-* View sections
+* View sections and stacks
 * Env
 * Route Middlewares
 
@@ -34,6 +34,12 @@ If you want to create admin panels for Laravel quick and easy checkout [Sanjab](
 
 
 ## Release Notes
+
+### 0.3.0
+* `env` autocomplete added.
+* Route `middleware` autocomplete added.
+* Nested stack and section support added.
+* Function parser improvment.
 
 ### 0.2.6
 * Blade stack autocomplete added.
