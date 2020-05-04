@@ -13,6 +13,7 @@ This extension provides [Laravel](https://laravel.com/) routes, views and ... au
 * Validation rules
 * View sections
 * Env
+* Route Middlewares
 
 ## Configuration
 ### LaravelExtraIntellisense.customValidationRules:

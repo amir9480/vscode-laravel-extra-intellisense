@@ -49,26 +49,32 @@ export default class ViewProvider implements vscode.CompletionItemProvider {
                 }
             }
         } else if (func && (func.function === '@section' || func.function === '@push')) {
-            var extendsRegex = /@extends\s*\([\'\"](.+)[\'\"]\)/g;
-            var regexResult:any = [];
-            if (regexResult = extendsRegex.exec(document.getText())) {
-                if (typeof this.views[regexResult[1]] !== 'undefined') {
-                    var parentContent = fs.readFileSync(this.views[regexResult[1]], 'utf8');
-                    var yieldRegex = /@yield\s*\([\'\"]([A-Za-z0-9_\-\.]+)[\'\"](,.*)?\)/g;
-                    if (func.function === '@push') {
-                        yieldRegex = /@stack\s*\([\'\"]([A-Za-z0-9_\-\.]+)[\'\"](,.*)?\)/g;
-                    }
-                    var yeildNames = [];
-                    while (regexResult = yieldRegex.exec(parentContent)) {
-                        yeildNames.push(regexResult[1]);
-                    }
-                    yeildNames = yeildNames.filter((v, i, a) => a.indexOf(v) === i);
-                    for (var i in yeildNames) {
-                        var yieldCompeleteItem = new vscode.CompletionItem(yeildNames[i], vscode.CompletionItemKind.Constant);
-                        yieldCompeleteItem.range = document.getWordRangeAtPosition(position, Helpers.wordMatchRegex);
-                        out.push(yieldCompeleteItem);
-                    }
+            out = this.getYields(func.function, document.getText());
+        }
+        return out;
+    }
+
+    getYields(func:string, documentText: string): Array<vscode.CompletionItem> {
+        var out: Array<vscode.CompletionItem> = [];
+        var extendsRegex = /@extends\s*\([\'\"](.+)[\'\"]\)/g;
+        var regexResult:any = [];
+        if (regexResult = extendsRegex.exec(documentText)) {
+            if (typeof this.views[regexResult[1]] !== 'undefined') {
+                var parentContent = fs.readFileSync(this.views[regexResult[1]], 'utf8');
+                var yieldRegex = /@yield\s*\([\'\"]([A-Za-z0-9_\-\.]+)[\'\"](,.*)?\)/g;
+                if (func === '@push') {
+                    yieldRegex = /@stack\s*\([\'\"]([A-Za-z0-9_\-\.]+)[\'\"](,.*)?\)/g;
                 }
+                var yeildNames = [];
+                while (regexResult = yieldRegex.exec(parentContent)) {
+                    yeildNames.push(regexResult[1]);
+                }
+                yeildNames = yeildNames.filter((v, i, a) => a.indexOf(v) === i);
+                for (var i in yeildNames) {
+                    var yieldCompeleteItem = new vscode.CompletionItem(yeildNames[i], vscode.CompletionItemKind.Constant);
+                    out.push(yieldCompeleteItem);
+                }
+                out = out.concat(this.getYields(func, parentContent));
             }
         }
         return out;
