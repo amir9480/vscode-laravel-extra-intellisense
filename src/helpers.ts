@@ -156,10 +156,7 @@ export default class Helpers {
 			}
 		}
 		// https://stackoverflow.com/a/35271017/5134885
-		var regexPattern = "(((" + classes.join('|') + ")::)?([@A-Za-z0-9_]+))((\\()((?:[^)(]+|\\((?:[^)(]+|\\([^)(]*\\))*\\))*)(\\)|$))";
-		for (let counter=0; counter < 12; counter++) {
-			regexPattern = regexPattern.replace("\\([^)(]*\\)", "\\((?:[^)(]+|\\([^)(]*\\))*(\\)|$)");
-		}
+		var regexPattern = "(((" + classes.join('|') + ")::)?([@A-Za-z0-9_]+))((\\()(([^)(]+|array\\s*\\(([^)(]+|array\\s*\\([^)(]*\\))*\\))*)(\\)|$))";
 		var functionRegex = new RegExp(regexPattern, "g");
 		var paramsRegex = /((\s*\,\s*)?)(\[.*(\]|$)|array\(.*(\)|$)|(\"((\\\")|[^\"])*(\"|$))|(\'((\\\')|[^\'])*(\'|$))|(\s+))/g;
 		var inlineFunctionMatch = /\((([\s\S]*\,)?\s*function\s*\(.*\)\s*\{)([\S\s]*)\}/g;
