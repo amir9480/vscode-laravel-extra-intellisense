@@ -44,7 +44,7 @@ export default class RouteProvider implements vscode.CompletionItemProvider {
                         }
                     }
                 }
-            } else {
+            } else if (func.function.includes('middleware') === false) {
                 if (func.paramIndex === 1) {
                     // route parameters autocomplete
                     for (let i in this.routes) {
