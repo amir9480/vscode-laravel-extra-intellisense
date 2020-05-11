@@ -55,6 +55,7 @@ export default class Helpers {
 				"$app = require_once '" + Helpers.projectPath("bootstrap/app.php") + "';" +
 				"class VscodeLaravelExtraIntellisenseProvider extends \\Illuminate\\Support\\ServiceProvider" +
 				"{" +
+				"   public function register() {}" +
 				"	public function boot()" +
 				"	{" +
 				"		$this->app['log']->setHandlers([new \\Monolog\\Handler\\NullHandler()]);" +

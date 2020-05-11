@@ -58,14 +58,14 @@ function showWelcomeMessage(context: vscode.ExtensionContext) {
 		message = "Laravel Extra Intellisense updated to " + currentVersion;
 	}
 	if (message) {
-		vscode.window.showInformationMessage(message, '⭐️ Star on Github', '🐞 Report Bug')
+		vscode.window.showInformationMessage(message, '👍 OK', '🐞 Report Bug')
 			.then(function (val: string | undefined) {
 				if (val === '⭐️ Rate') {
 					vscode.env.openExternal(vscode.Uri.parse('https://marketplace.visualstudio.com/items?itemName=amiralizadeh9480.laravel-extra-intellisense'));
 				} else if (val === '🐞 Report Bug') {
 					vscode.env.openExternal(vscode.Uri.parse('https://github.com/amir9480/vscode-laravel-extra-intellisense/issues'));
 				} else if (val === '⭐️ Star on Github') {
-					vscode.env.openExternal(vscode.Uri.parse('https://github.com/amir9480/vscode-laravel-extra-intellisense#other-products'));
+					vscode.env.openExternal(vscode.Uri.parse('https://github.com/amir9480/vscode-laravel-extra-intellisense'));
 				}
 			});
 		context.globalState.update('laravel-extra-intellisense-version', currentVersion);

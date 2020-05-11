@@ -35,11 +35,14 @@ If you want to create admin panels for Laravel quick and easy checkout [Sanjab](
 
 ## Release Notes
 
+### 0.3.1
+* Fix #18.
+
 ### 0.3.0
 * `env` autocomplete added.
 * Route `middleware` autocomplete added.
 * Nested stack and section support added.
-* Function parser improvment.
+* Function parser improvement.
 
 ### 0.2.6
 * Blade stack autocomplete added.
