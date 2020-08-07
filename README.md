@@ -35,6 +35,10 @@ If you want to create admin panels for Laravel quick and easy checkout [Sanjab](
 
 ## Release Notes
 
+### 0.3.2
+* Add configuration for views separator (#22).
+* `can`, `cannot` autocomplete.
+
 ### 0.3.1
 * Fix #18.
 

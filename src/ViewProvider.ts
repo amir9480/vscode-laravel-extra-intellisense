@@ -132,7 +132,7 @@ export default class ViewProvider implements vscode.CompletionItemProvider {
                 if (fs.lstatSync(path+file).isDirectory()) {
                     var viewsInDirectory = self.getViews(path + file + "/");
                     for (var i in viewsInDirectory) {
-                        out[file + "." + i] = viewsInDirectory[i];
+                        out[file + vscode.workspace.getConfiguration("LaravelExtraIntellisense").get<string>('viewDirectorySeperator') + i] = viewsInDirectory[i];
                     }
                 } else {
                     if (file.includes("blade.php")) {

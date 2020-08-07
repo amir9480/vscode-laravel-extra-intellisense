@@ -30,6 +30,11 @@
 						"type": "object",
 						"default": {},
 						"description": "Custom validation rules snippets."
+					},
+					"LaravelExtraIntellisense.viewDirectorySeperator": {
+						"type": "string",
+						"default": ".",
+						"description": ". or /"
 					}
 				}
 			}
