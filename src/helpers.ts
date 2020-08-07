@@ -10,6 +10,8 @@ export default class Helpers {
 	static wordMatchRegex = /[\w\d\-_\.\:\\\/]+/g;
 	static phpParser:any = null;
 	static cachedParseFunction:any = null;
+	static modelsCache: Array<string>;
+	static modelsCacheTime: number = 0;
 
 	static tags:any = {
 		config: 	{classes: ['Config']	, functions: ['config']},
@@ -19,6 +21,7 @@ export default class Helpers {
 		validation:	{classes: ['Validator'] , functions: ['validate', 'sometimes', 'rules']},
 		view: 		{classes: ['View']		, functions: ['view', 'markdown', 'links', '@extends', '@component', '@include', '@each']},
 		env: 		{classes: []			, functions: ['env']},
+		auth: 		{classes: ['Gate']		, functions: ['can', '@can', '@cannot', '@canany']},
 	};
 	static functionRegex: any = null;
 
@@ -47,7 +50,8 @@ export default class Helpers {
 	 *
 	 * @param code
 	 */
-	static async runLaravel(code: string) : Promise<string> {
+	static runLaravel(code: string) : Promise<string> {
+		code = code.replace(/(?:\r\n|\r|\n)/g, ' ');
 		if (fs.existsSync(Helpers.projectPath("vendor/autoload.php")) && fs.existsSync(Helpers.projectPath("bootstrap/app.php"))) {
 			var command =
 				"define('LARAVEL_START', microtime(true));" +
@@ -72,13 +76,25 @@ export default class Helpers {
 				 code +
 				"echo '___VSCODE_LARAVEL_EXTRA_INSTELLISENSE_END_OUTPUT___';";
 
-			var out : string | null | RegExpExecArray = await this.runPhp(command);
-			out = /___VSCODE_LARAVEL_EXTRA_INSTELLISENSE_OUTPUT___(.*)___VSCODE_LARAVEL_EXTRA_INSTELLISENSE_END_OUTPUT___/g.exec(out);
-			if (out) {
-				return out[1];
-			}
+			var self = this;
+
+			return new Promise(function (resolve, error) {
+				self.runPhp(command)
+					.then(function (result: string) {
+						var out : string | null | RegExpExecArray = result;
+						out = /___VSCODE_LARAVEL_EXTRA_INSTELLISENSE_OUTPUT___(.*)___VSCODE_LARAVEL_EXTRA_INSTELLISENSE_END_OUTPUT___/g.exec(out);
+						if (out) {
+							resolve(out[1]);
+						} else {
+							error("PARSE ERROR: " + result);
+						}
+					})
+					.catch(function (e : Error) {
+						error(e);
+					});
+			});
 		}
-		return "";
+		return new Promise((resolve, error) => resolve(""));
 	}
 
 	/**
@@ -204,8 +220,42 @@ export default class Helpers {
 		return out;
 	}
 
+	/**
+	 * Parse php function call from vscode editor.
+	 *
+	 * @param document
+	 * @param position
+	 */
 	static parseDocumentFunction(document: vscode.TextDocument, position: vscode.Position) {
         var pos = document.offsetAt(position);
         return Helpers.parseFunction(document.getText(), pos);
+	}
+
+	/**
+	 * Get laravel models as array.
+	 *
+	 * @returns array<string>
+	 */
+	static getModels() : Promise<Array<string>> {
+		var self = this;
+		return new Promise<Array<string>>(function (resolve, reject) {
+			if (Math.floor(Date.now()/1000) - self.modelsCacheTime < 60) {
+				return resolve(self.modelsCache);
+			} else {
+				Helpers.runLaravel(`
+					echo json_encode(array_values(array_filter(array_map(function ($name) {return app()->getNamespace().str_replace([app_path().'/', app_path().'\\\\', '.php', '/'], ['', '', '', '\\\\'], $name);}, array_merge(glob(app_path('*')), glob(app_path('Models/*')))), function ($class) {
+						return class_exists($class) && is_subclass_of($class, 'Illuminate\\\\Database\\\\Eloquent\\\\Model');
+					})));
+				`).then(function (result) {
+					var models = JSON.parse(result);
+					self.modelsCache = models;
+					resolve(models);
+				})
+				.catch(function (error) {
+					console.error(error);
+					resolve([]);
+				});
+			}
+		});
 	}
 }

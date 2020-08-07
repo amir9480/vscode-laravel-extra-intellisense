@@ -12,6 +12,7 @@ import MixProvider from './MixProvider';
 import ValidationProvider from './ValidationProvider';
 import EnvProvider from './EnvProvider';
 import MiddlewareProvider from './MiddlewareProvider';
+import AuthProvider from './AuthProvider';
 
 
 
@@ -35,6 +36,7 @@ export function activate(context: vscode.ExtensionContext) {
 			context.subscriptions.push(vscode.languages.registerCompletionItemProvider(LANGUAGES, new ValidationProvider, ...TRIGGER_CHARACTERS.concat(['|'])));
 			context.subscriptions.push(vscode.languages.registerCompletionItemProvider(LANGUAGES, new EnvProvider, ...TRIGGER_CHARACTERS));
 			context.subscriptions.push(vscode.languages.registerCompletionItemProvider(LANGUAGES, new MiddlewareProvider, ...TRIGGER_CHARACTERS));
+			context.subscriptions.push(vscode.languages.registerCompletionItemProvider(LANGUAGES, new AuthProvider, ...TRIGGER_CHARACTERS));
 		}
 	}
 }
@@ -58,7 +60,7 @@ function showWelcomeMessage(context: vscode.ExtensionContext) {
 		message = "Laravel Extra Intellisense updated to " + currentVersion;
 	}
 	if (message) {
-		vscode.window.showInformationMessage(message, '👍 OK', '🐞 Report Bug')
+		vscode.window.showInformationMessage(message, '⭐️ Star on Github', '🐞 Report Bug')
 			.then(function (val: string | undefined) {
 				if (val === '⭐️ Rate') {
 					vscode.env.openExternal(vscode.Uri.parse('https://marketplace.visualstudio.com/items?itemName=amiralizadeh9480.laravel-extra-intellisense'));
