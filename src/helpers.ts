@@ -62,7 +62,9 @@ export default class Helpers {
 				"   public function register() {}" +
 				"	public function boot()" +
 				"	{" +
-				"		$this->app['log']->setHandlers([new \\Monolog\\Handler\\NullHandler()]);" +
+				"       if (method_exists($this->app['log'], 'setHandlers')) {" +
+				"			$this->app['log']->setHandlers([new \\Monolog\\Handler\\NullHandler()]);" +
+				"		}" +
 				"	}" +
 				"}" +
 				"$app->register(new VscodeLaravelExtraIntellisenseProvider($app));" +
