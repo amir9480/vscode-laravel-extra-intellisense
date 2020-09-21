@@ -179,6 +179,9 @@ export default class Helpers {
 		var paramsRegex = /((\s*\,\s*)?)(\[.*(\]|$)|array\(.*(\)|$)|(\"((\\\")|[^\"])*(\"|$))|(\'((\\\')|[^\'])*(\'|$))|(\s+))/g;
 		var inlineFunctionMatch = /\((([\s\S]*\,)?\s*function\s*\(.*\)\s*\{)([\S\s]*)\}/g;
 
+		text = text.substr(Math.max(0, position - 200), position + 200);
+		position -= Math.max(0, position - 200);
+
 		var match = null;
 		var match2 = null;
 		if (Helpers.cachedParseFunction !== null && Helpers.cachedParseFunction.text === text && position === Helpers.cachedParseFunction.position) {

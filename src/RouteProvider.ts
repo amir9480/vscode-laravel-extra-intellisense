@@ -32,7 +32,6 @@ export default class RouteProvider implements vscode.CompletionItemProvider {
         }
 
         if (func && ((func.class && Helpers.tags.route.classes.some((cls:string) => func.class.includes(cls))) || Helpers.tags.route.functions.some((fn:string) => func.function.includes(fn)))) {
-
             if (func.class === 'Route' && ['get', 'post', 'put', 'patch', 'delete', 'options', 'any', 'match'].some((fc:string) => func.function.includes(fc))) {
                 if ((func.function === 'match' && func.paramIndex === 2) || (func.function !== 'match' && func.paramIndex === 1)) {
                     // Route action autocomplete.
@@ -127,17 +126,19 @@ export default class RouteProvider implements vscode.CompletionItemProvider {
                 } else {
                     if (file.includes(".php")) {
                         var controllerContent = fs.readFileSync(path + file, 'utf8');
-                        var match = ((/class\s+([A-Za-z0-9_]+)\s+extends\s+.+/g).exec(controllerContent));
-                        var matchNamespace = ((/namespace .+\\Http\\Controllers\\?([A-Za-z0-9_]*)/g).exec(controllerContent));
-                        var functionRegex = /public\s+function\s+([A-Za-z0-9_]+)\(.*\)/g;
-                        if (match !== null && matchNamespace) {
-                            var className = match[1];
-                            var namespace = matchNamespace[1];
-                            while ((match = functionRegex.exec(controllerContent)) !== null && match[1] !== '__construct') {
-                                if (namespace.length > 0) {
-                                    controllers.push(namespace + '\\' + className + '@' + match[1]);
+                        if (controllerContent.length < 50000) {
+                            var match = ((/class\s+([A-Za-z0-9_]+)\s+extends\s+.+/g).exec(controllerContent));
+                            var matchNamespace = ((/namespace .+\\Http\\Controllers\\?([A-Za-z0-9_]*)/g).exec(controllerContent));
+                            var functionRegex = /public\s+function\s+([A-Za-z0-9_]+)\(.*\)/g;
+                            if (match !== null && matchNamespace) {
+                                var className = match[1];
+                                var namespace = matchNamespace[1];
+                                while ((match = functionRegex.exec(controllerContent)) !== null && match[1] !== '__construct') {
+                                    if (namespace.length > 0) {
+                                        controllers.push(namespace + '\\' + className + '@' + match[1]);
+                                    }
+                                    controllers.push(className + '@' + match[1]);
                                 }
-                                controllers.push(className + '@' + match[1]);
                             }
                         }
                     }
