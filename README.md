@@ -27,13 +27,11 @@ Example:
 }
 ```
 
-## Other products
-[![Laravel Sanjab](/images/sanjab-banner.jpg)](https://github.com/sanjabteam/sanjab)
-
-If you want to create admin panels for Laravel quick and easy checkout [Sanjab](https://github.com/sanjabteam/sanjab) package. It is also free.
-
-
 ## Release Notes
+
+### 0.3.3
+* Performance improvement.
+* Bug fixes (#25, #26)
 
 ### 0.3.2
 * Add configuration for views separator (#22).
