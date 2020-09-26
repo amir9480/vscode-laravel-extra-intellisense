@@ -174,12 +174,12 @@ export default class Helpers {
 				classes.push(Helpers.tags[i].classes[j]);
 			}
 		}
-		var regexPattern = "(((" + classes.join('|') + ")::)?([@A-Za-z0-9_]+))((\\()((?:[^)(]+|\\((?:[^)(]+|\\([^)(]*\\))*\\))*)(\\)|$))";
+		var regexPattern = "(((" + classes.join('|') + ")::)?([@A-Za-z0-9_]+))((\\()((?:[^)(]|\\((?:[^)(]|\\([^)(]*\\))*\\))*)(\\)|$))";
 		var functionRegex = new RegExp(regexPattern, "g");
-		var paramsRegex = /((\s*\,\s*)?)(\[.*(\]|$)|array\(.*(\)|$)|(\"((\\\")|[^\"])*(\"|$))|(\'((\\\')|[^\'])*(\'|$))|(\s+))/g;
+		var paramsRegex = /((\s*\,\s*)?)(\[[\s\S]*(\]|$)|array\[\s\S]*(\)|$)|(\"((\\\")|[^\"])*(\"|$))|(\'((\\\')|[^\'])*(\'|$)))/g;
 		var inlineFunctionMatch = /\((([\s\S]*\,)?\s*function\s*\(.*\)\s*\{)([\S\s]*)\}/g;
 
-		text = text.substr(Math.max(0, position - 200), position + 200);
+		text = text.substr(Math.max(0, position - 200), 400);
 		position -= Math.max(0, position - 200);
 
 		var match = null;
