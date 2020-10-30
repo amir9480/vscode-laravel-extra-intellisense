@@ -29,14 +29,28 @@ export default class Helpers {
 	 * Create full path from project file name
 	 *
 	 * @param path
+	 * @param forCode
 	 * @param string
 	 */
-	static projectPath(path:string) : string {
+	static projectPath(path:string, forCode: boolean = false) : string {
 		if (path[0] !== '/') {
 			path = '/' + path;
 		}
+
+		let basePath = vscode.workspace.getConfiguration("LaravelExtraIntellisense").get<string>('basePath');
+		if (forCode === false && basePath && basePath.length > 0) {
+			basePath = basePath.replace(/[\/\\]$/, "");
+			return basePath + path;
+		}
+
+		let basePathForCode = vscode.workspace.getConfiguration("LaravelExtraIntellisense").get<string>('basePathForCode');
+		if (forCode && basePathForCode && basePathForCode.length > 0) {
+			basePathForCode = basePathForCode.replace(/[\/\\]$/, "");
+			return basePathForCode + path;
+		}
+
 		if (vscode.workspace.workspaceFolders instanceof Array && vscode.workspace.workspaceFolders.length > 0) {
-			return vscode.workspace.workspaceFolders[0].uri.fsPath+path;
+			return vscode.workspace.workspaceFolders[0].uri.fsPath + path;
 		}
 		return "";
 	}
@@ -55,8 +69,8 @@ export default class Helpers {
 		if (fs.existsSync(Helpers.projectPath("vendor/autoload.php")) && fs.existsSync(Helpers.projectPath("bootstrap/app.php"))) {
 			var command =
 				"define('LARAVEL_START', microtime(true));" +
-				"require_once '" + Helpers.projectPath("vendor/autoload.php") + "';" +
-				"$app = require_once '" + Helpers.projectPath("bootstrap/app.php") + "';" +
+				"require_once '" + Helpers.projectPath("vendor/autoload.php", true) + "';" +
+				"$app = require_once '" + Helpers.projectPath("bootstrap/app.php", true) + "';" +
 				"class VscodeLaravelExtraIntellisenseProvider extends \\Illuminate\\Support\\ServiceProvider" +
 				"{" +
 				"   public function register() {}" +
@@ -111,7 +125,8 @@ export default class Helpers {
 			code = code.replace(/\\\\'/g, '\\\\\\\\\'');
 			code = code.replace(/\\\\"/g, '\\\\\\\\\"');
 		}
-		var command = "php -r \"" + code + "\"";
+		let command = vscode.workspace.getConfiguration("LaravelExtraIntellisense").get<string>('phpCommand') ?? "php -r \"{code}\"";
+		command = command.replace("{code}", code);
 		let out = new Promise<string>(function (resolve, error) {
 			cp.exec(command, function (err, stdout, stderr) {
 				if (stdout.length > 0) {

@@ -101,6 +101,14 @@ export default class ViewProvider implements vscode.CompletionItemProvider {
                     Helpers.runLaravel(code)
                         .then(function (viewNamespacesResult) {
                             var viewNamespaces = JSON.parse(viewNamespacesResult);
+                            for (let i in viewPaths) {
+                                viewPaths[i] = viewPaths[i].replace(Helpers.projectPath('/', true), Helpers.projectPath('/'));
+                            }
+                            for (let i in viewNamespaces) {
+                                for (let j in viewNamespaces[i]) {
+                                    viewNamespaces[i][j] = viewNamespaces[i][j].replace(Helpers.projectPath('/', true), Helpers.projectPath('/'));
+                                }
+                            }
                             let views:any = {};
                             for (let i in viewPaths) {
                                 views = Object.assign(views, self.getViews(viewPaths[i]));
@@ -132,7 +140,7 @@ export default class ViewProvider implements vscode.CompletionItemProvider {
                 if (fs.lstatSync(path+file).isDirectory()) {
                     var viewsInDirectory = self.getViews(path + file + "/");
                     for (var i in viewsInDirectory) {
-                        out[file + vscode.workspace.getConfiguration("LaravelExtraIntellisense").get<string>('viewDirectorySeperator') + i] = viewsInDirectory[i];
+                        out[file + vscode.workspace.getConfiguration("LaravelExtraIntellisense").get<string>('viewDirectorySeparator') + i] = viewsInDirectory[i];
                     }
                 } else {
                     if (file.includes("blade.php")) {
