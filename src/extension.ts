@@ -57,7 +57,7 @@ function showWelcomeMessage(context: vscode.ExtensionContext) {
 		(previousVersionArray[0] < currentVersionArray[0])
 	)
 	) {
-		message = "Laravel Extra Intellisense updated to " + currentVersion + " - New feature: Docker support";
+		message = "Laravel Extra Intellisense updated to " + currentVersion;
 	}
 	if (message) {
 		vscode.window.showInformationMessage(message, '⭐️ Star on Github', '🐞 Report Bug')
