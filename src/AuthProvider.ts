@@ -48,11 +48,11 @@ export default class AuthProvider implements vscode.CompletionItemProvider {
             Helpers.runLaravel(`
                 echo json_encode(
                     array_merge(
-                        array_keys(Gate::abilities()),
+                        array_keys(Illuminate\\Support\\Facades\\Gate::abilities()),
                         array_values(
                             array_filter(
                                 array_unique(
-                                    Arr::flatten(
+                                    Illuminate\\Support\\Arr::flatten(
                                         array_map(
                                             function ($val, $key) {
                                                 return array_map(
@@ -62,8 +62,8 @@ export default class AuthProvider implements vscode.CompletionItemProvider {
                                                     (new ReflectionClass($val))->getMethods()
                                                 );
                                             },
-                                            Gate::policies(),
-                                            array_keys(Gate::policies())
+                                            Illuminate\\Support\\Facades\\Gate::policies(),
+                                            array_keys(Illuminate\\Support\\Facades\\Gate::policies())
                                         )
                                     )
                                 ),
