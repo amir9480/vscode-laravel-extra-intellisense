@@ -22,6 +22,7 @@ export default class Helpers {
 		view: 		{classes: ['View']		, functions: ['view', 'markdown', 'links', '@extends', '@component', '@include', '@each']},
 		env: 		{classes: []			, functions: ['env']},
 		auth: 		{classes: ['Gate']		, functions: ['can', '@can', '@cannot', '@canany']},
+		asset: 		{classes: []			, functions: ['asset']},
 	};
 	static functionRegex: any = null;
 

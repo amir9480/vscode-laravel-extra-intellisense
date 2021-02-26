@@ -16,6 +16,7 @@ This extension provides [Laravel](https://laravel.com/) routes, views and ... au
 * [View sections and stacks](#view-sections-and-stacks)
 * [Env](#env)
 * [Route Middlewares](#route-middlewares)
+* Asset
 
 ### Route names and route parameters
 ![Routes](./images/screenshot-route.gif)
@@ -74,6 +75,9 @@ It is possible to use this extension with other docker images or even other virt
 ```
 
 ## Release Notes
+
+### 0.5.0
+* Add `asset` support.
 
 ### 0.4.0
 * Add Docker support.

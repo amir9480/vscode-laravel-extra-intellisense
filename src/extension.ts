@@ -13,6 +13,7 @@ import ValidationProvider from './ValidationProvider';
 import EnvProvider from './EnvProvider';
 import MiddlewareProvider from './MiddlewareProvider';
 import AuthProvider from './AuthProvider';
+import AssetProvider from './AssetProvider';
 
 
 
@@ -37,6 +38,7 @@ export function activate(context: vscode.ExtensionContext) {
 			context.subscriptions.push(vscode.languages.registerCompletionItemProvider(LANGUAGES, new EnvProvider, ...TRIGGER_CHARACTERS));
 			context.subscriptions.push(vscode.languages.registerCompletionItemProvider(LANGUAGES, new MiddlewareProvider, ...TRIGGER_CHARACTERS));
 			context.subscriptions.push(vscode.languages.registerCompletionItemProvider(LANGUAGES, new AuthProvider, ...TRIGGER_CHARACTERS));
+			context.subscriptions.push(vscode.languages.registerCompletionItemProvider(LANGUAGES, new AssetProvider, ...TRIGGER_CHARACTERS));
 		}
 	}
 }
@@ -57,7 +59,7 @@ function showWelcomeMessage(context: vscode.ExtensionContext) {
 		(previousVersionArray[0] < currentVersionArray[0])
 	)
 	) {
-		message = "Laravel Extra Intellisense updated to " + currentVersion;
+		message = "Laravel Extra Intellisense updated to " + currentVersion + " - New feature: asset autocomplete added.";
 	}
 	if (message) {
 		vscode.window.showInformationMessage(message, '⭐️ Star on Github', '🐞 Report Bug')
