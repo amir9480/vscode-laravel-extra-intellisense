@@ -61,7 +61,7 @@ function showWelcomeMessage(context: vscode.ExtensionContext) {
 		(previousVersionArray[0] < currentVersionArray[0])
 	)
 	) {
-		message = "Laravel Extra Intellisense updated to " + currentVersion;
+		message = "Laravel Extra Intellisense updated to " + currentVersion + " - New features: asset autocomplete added. Model attributes added (Beta!).";
 	}
 	if (message) {
 		vscode.window.showInformationMessage(message, '⭐️ Star on Github', '🐞 Report Bug')

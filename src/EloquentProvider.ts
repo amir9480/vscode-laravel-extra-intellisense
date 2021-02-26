@@ -107,9 +107,11 @@ export default class EloquentProvider implements vscode.CompletionItemProvider {
         try {
             for (let modelsPath of vscode.workspace.getConfiguration("LaravelExtraIntellisense").get<Array<string>>('modelsPaths', ['app', 'app/Models'])) {
                 Helpers.runLaravel(
-                    "foreach (scandir(base_path('" + modelsPath + "')) as $sourceFile) {" +
-                    "   if (substr($sourceFile, -4) == '.php' && is_file(base_path(\"" + modelsPath + "/$sourceFile\"))) {" +
-                    "       include_once base_path(\"" + modelsPath + "/$sourceFile\");" +
+                    "if (is_dir(base_path('" + modelsPath + "'))) {" +
+                    "   foreach (scandir(base_path('" + modelsPath + "')) as $sourceFile) {" +
+                    "      if (substr($sourceFile, -4) == '.php' && is_file(base_path(\"" + modelsPath + "/$sourceFile\"))) {" +
+                    "          include_once base_path(\"" + modelsPath + "/$sourceFile\");" +
+                    "      }" +
                     "   }" +
                     "}" +
                     "$modelClasses = array_values(array_filter(get_declared_classes(), function ($declaredClass) {" +
@@ -121,7 +123,7 @@ export default class EloquentProvider implements vscode.CompletionItemProvider {
                     "   try {" +
                     "       $modelInstance = $modelClass::first();" +
                     "       $output[$modelClass]['attributes'] = array_values(array_unique(array_merge(app($modelClass)->getFillable(), array_keys($modelInstance ? $modelInstance->getAttributes() : []))));" +
-                    "   } catch (\\Exception $e) {}" +
+                    "   } catch (\\Throwable $e) {}" +
                     "   foreach ((new \\ReflectionClass($modelClass))->getMethods() as $classMethod) {" +
                     "       try {" +
                     "           if (" +
@@ -130,11 +132,11 @@ export default class EloquentProvider implements vscode.CompletionItemProvider {
                     "                substr($classMethod->getName(), 0, 3) != 'get' &&" +
                     "                substr($classMethod->getName(), 0, 3) != 'set' &&" +
                     "                count($classMethod->getParameters()) == 0 &&" +
-                    "                $classMethod->invoke(app($modelClass)) instanceof \\Illuminate\\Database\\Eloquent\\Relations\\Relation" +
+                    "                preg_match('/belongsTo|hasMany|hasOne|morphOne|morphMany|morphTo/', implode('', array_slice(file($classMethod->getFileName()), $classMethod->getStartLine(), $classMethod->getEndLine() - $classMethod->getStartLine() - 1)))" +
                     "           ) {" +
                     "               $output[$modelClass]['relations'][] = $classMethod->getName();" +
                     "           }" +
-                    "       } catch (\\Exception $e) {}" +
+                    "       } catch (\\Throwable $e) {}" +
                     "   }" +
                     "   sort($output[$modelClass]['attributes']);" +
                     "   sort($output[$modelClass]['relations']);" +
