@@ -19,7 +19,7 @@
 		"type": "git",
 		"url": "https://github.com/amir9480/vscode-laravel-extra-intellisense"
 	},
-	"main": "./out/extension.js",
+	"main": "./dist/extension.js",
 	"contributes": {
 		"configuration": [
 			{
@@ -48,6 +48,14 @@
 					"LaravelExtraIntellisense.basePathForCode": {
 						"type": "string",
 						"description": "This base path using for require_once inside PHP code."
+					},
+					"LaravelExtraIntellisense.modelsPaths": {
+						"type": "array",
+						"default": [
+							"app",
+							"app\\Models"
+						],
+						"description": "Path of models you put your model codes."
 					}
 				}
 			}
@@ -57,19 +65,20 @@
 		"vscode:prepublish": "webpack --mode production",
 		"compile": "webpack --mode development",
 		"watch": "webpack --mode development --watch",
-		"test": "tsc -p ./"
+		"test": "tsc -p ./",
+		"lint": "eslint . --ext .ts,.tsx"
 	},
 	"dependencies": {
 		"php-parser": "^3.0.2"
 	},
 	"devDependencies": {
-		"@types/mocha": "^8.0.3",
-		"@types/node": "^14.14.6",
-		"ts-loader": "^8.0.7",
+		"@types/mocha": "^8.2.1",
+		"@types/node": "^14.14.31",
+		"ts-loader": "^8.0.17",
 		"tslint": "^6.1.3",
-		"typescript": "^4.0.5",
+		"typescript": "^4.2.2",
 		"vscode": "^1.1.37",
-		"webpack": "^5.3.2",
-		"webpack-cli": "^4.1.0"
+		"webpack": "^5.24.2",
+		"webpack-cli": "^4.5.0"
 	}
 }

@@ -17,6 +17,7 @@ This extension provides [Laravel](https://laravel.com/) routes, views and ... au
 * [Env](#env)
 * [Route Middlewares](#route-middlewares)
 * Asset
+* Model Attributes (Beta!)
 
 ### Route names and route parameters
 ![Routes](./images/screenshot-route.gif)
@@ -64,6 +65,9 @@ Same as `LaravelExtraIntellisense.basePath` but this one using for `require_once
 
 ### LaravelExtraIntellisense.viewDirectorySeparator
 You also can use `/` instead of `.` as directory separator for view autocomplete.
+
+### LaravelExtraIntellisense.modelsPaths
+Array of paths including your models. (Default: `["app", "app\\Models"]`)
 
 #### Sample config to use docker
 This is a simple configuration to use via [Laradock](https://github.com/laradock/laradock).

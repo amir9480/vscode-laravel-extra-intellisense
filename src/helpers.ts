@@ -23,6 +23,7 @@ export default class Helpers {
 		env: 		{classes: []			, functions: ['env']},
 		auth: 		{classes: ['Gate']		, functions: ['can', '@can', '@cannot', '@canany']},
 		asset: 		{classes: []			, functions: ['asset']},
+		model:		{classes: []			, functions: []},
 	};
 	static functionRegex: any = null;
 

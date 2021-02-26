@@ -51,7 +51,7 @@ export default class ConfigProvider implements vscode.CompletionItemProvider {
         }, 5000);
     }
 
-    loadConfigs () {
+    loadConfigs() {
         try {
             var self = this;
             Helpers.runLaravel("echo json_encode(config()->all());")
