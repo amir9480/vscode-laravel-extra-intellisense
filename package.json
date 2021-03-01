@@ -53,7 +53,7 @@
 						"type": "array",
 						"default": [
 							"app",
-							"app\\Models"
+							"app/Models"
 						],
 						"description": "Path of models you put your model codes."
 					}

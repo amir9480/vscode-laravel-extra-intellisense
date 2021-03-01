@@ -67,7 +67,7 @@ Same as `LaravelExtraIntellisense.basePath` but this one using for `require_once
 You also can use `/` instead of `.` as directory separator for view autocomplete.
 
 ### LaravelExtraIntellisense.modelsPaths
-Array of paths including your models. (Default: `["app", "app\\Models"]`)
+Array of paths including your models. (Default: `["app", "app/Models"]`)
 
 #### Sample config to use docker
 This is a simple configuration to use via [Laradock](https://github.com/laradock/laradock).
