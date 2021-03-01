@@ -78,86 +78,59 @@ It is possible to use this extension with other docker images or even other virt
 "LaravelExtraIntellisense.basePathForCode": "/var/www/your-project"
 ```
 
+## Note
+> This extension runs your Laravel application automatically and periodically to get the information needed to provide autocomplete.
+> So if you have any unknown errors in your log make sure the extension not causing it.
+> Also if you writing any sensitive code in your service providers, disable the extension temporarily to prevent unwanted application executing.
+
 ## Release Notes
 
-### 0.5.0
+### 0.5.x
 * Add `asset` support.
 
-### 0.4.0
+### 0.4.x
 * Add Docker support.
 
-### 0.3.3
-* Performance improvement.
-* Bug fixes (#25, #26)
-
-### 0.3.2
-* Add configuration for views separator (#22).
-* `can`, `cannot` autocomplete.
-
-### 0.3.1
-* Fix #18.
-
-### 0.3.0
+### 0.3.x
 * `env` autocomplete added.
 * Route `middleware` autocomplete added.
 * Nested stack and section support added.
 * Function parser improvement.
+* Performance improvement.
+* Bug fixes (#25, #26)
+* Add configuration for views separator (#22).
+* `can`, `cannot` autocomplete.
+* Fix #18.
 
-### 0.2.6
+### 0.2.x
+* Validation rules autocomplete added.
+* works with `Validator` class, `validate` functions and inside request classes.
+* `markdown` function added to view functions for autocomplete.
+* Using file watcher instead of save event. Better change detect for view autocomplete.
+* json translation autocomplete added.
+* Auto-Retry removed from all providers. causes some performance issues.
+* Disable logging added.
+* View parameters autocomplete.
+* Route autocomplete bug in linux fixed.
+* Blade section autocomplete added.
 * Blade stack autocomplete added.
 * Duplicate section autocomplete items fixed.
 * PHP commands converted to async functions to prevent unresponsive extension host error.
 
-### 0.2.4
-* Blade section autocomplete added.
-
-### 0.2.3
-* View parameters autocomplete.
-* Route autocomplete bug in linux fixed.
-
-### 0.2.2
-* Auto-Retry removed from all providers. causes some performance issues.
-* Disable logging added.
-
-### 0.2.1
-* `markdown` function added to view functions for autocomplete.
-* Using file watcher instead of save event. Better change detect for view autocomplete.
-* json translation autocomplete added.
-
-### 0.2.0
-Validation rules autocomplete added.
-works with `Validator` class, `validate` functions and inside request classes.
-
-### 0.1.5
-Route action autocomplete added. `Route::get`, `Route::post`,... autocompletes controller actions inside app\Http\Controllers.
-
-### 0.1.2 - 0.1.4
-Performance improvments.
-
-### 0.1.1
-Add mix autocomplete.
-
-### 0.1.0
+### 0.1.x
 Fix problems with linux.
 Add translation autocomplete.
 Improved providers.
+Add mix autocomplete.
+Performance improvments.
+Route action autocomplete added. `Route::get`, `Route::post`,... autocompletes controller actions inside app\Http\Controllers.
 
-### 0.0.6
+### 0.0.x
 Config autocomplete added.
-
-### 0.0.5
 Route bug fix.
-
-### 0.0.4
 View names with namespaces ready to use.
-
-### 0.0.3
 View functions autocompelete added.
-
-### 0.0.2
 Blade bug fix.
-
-### 0.0.1
 Add route autocomplete.
 
 
