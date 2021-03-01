@@ -87,6 +87,7 @@ It is possible to use this extension with other docker images or even other virt
 
 ### 0.5.x
 * Add `asset` support.
+* Add Model attributes autocomplete (Beta).
 
 ### 0.4.x
 * Add Docker support.
