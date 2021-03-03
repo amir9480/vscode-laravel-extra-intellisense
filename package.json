@@ -2,7 +2,7 @@
 	"name": "laravel-extra-intellisense",
 	"displayName": "Laravel Extra Intellisense",
 	"description": "better intellisense for laravel projects.",
-	"version": "0.5.1",
+	"version": "0.5.2",
 	"publisher": "amiralizadeh9480",
 	"icon": "images/icon.png",
 	"engines": {
@@ -59,7 +59,9 @@
 					},
 					"LaravelExtraIntellisense.modelVariables": {
 						"type": "object",
-						"default": {"user": "App\\Models\\User"},
+						"default": {
+							"user": "App\\Models\\User"
+						},
 						"description": "Variables that should provide model autocomplete."
 					}
 				}
