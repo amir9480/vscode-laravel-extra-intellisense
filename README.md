@@ -119,20 +119,20 @@ It is possible to use this extension with other docker images or even other virt
 * PHP commands converted to async functions to prevent unresponsive extension host error.
 
 ### 0.1.x
-Fix problems with linux.
-Add translation autocomplete.
-Improved providers.
-Add mix autocomplete.
-Performance improvments.
-Route action autocomplete added. `Route::get`, `Route::post`,... autocompletes controller actions inside app\Http\Controllers.
+* Fix problems with linux.
+* Add translation autocomplete.
+* Improved providers.
+* Add mix autocomplete.
+* Performance improvments.
+* Route action autocomplete added. `Route::get`, *`Route::post`, ... autocompletes controller actions inside app\Http\Controllers.
 
 ### 0.0.x
-Config autocomplete added.
-Route bug fix.
-View names with namespaces ready to use.
-View functions autocompelete added.
-Blade bug fix.
-Add route autocomplete.
+* Config autocomplete added.
+* Route bug fix.
+* View names with namespaces ready to use.
+* View functions autocompelete added.
+* Blade bug fix.
+* Add route autocomplete.
 
 
 ## Recommended extensions
