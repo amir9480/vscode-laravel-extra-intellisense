@@ -27,6 +27,11 @@ export default class Helpers {
 	};
 	static functionRegex: any = null;
 
+	static relationMethods =  ['has', 'orHas', 'whereHas', 'orWhereHas', 'whereDoesntHave', 'orWhereDoesntHave',
+							   'doesntHave', 'orDoesntHave', 'hasMorph', 'orHasMorph', 'doesntHaveMorph', 'orDoesntHaveMorph',
+							   'whereHasMorph', 'orWhereHasMorph', 'whereDoesntHaveMorph', 'orWhereDoesntHaveMorph',
+							   'withAggregate', 'withCount', 'withMax', 'withMin', 'withSum', 'withAvg'];
+
 	/**
 	 * Create full path from project file name
 	 *

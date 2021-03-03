@@ -56,6 +56,11 @@
 							"app/Models"
 						],
 						"description": "Path of models you put your model codes."
+					},
+					"LaravelExtraIntellisense.modelVariables": {
+						"type": "object",
+						"default": {"user": "App\\Models\\User"},
+						"description": "Variables that should provide model autocomplete."
 					}
 				}
 			}

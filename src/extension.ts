@@ -40,7 +40,7 @@ export function activate(context: vscode.ExtensionContext) {
 			context.subscriptions.push(vscode.languages.registerCompletionItemProvider(LANGUAGES, new MiddlewareProvider, ...TRIGGER_CHARACTERS));
 			context.subscriptions.push(vscode.languages.registerCompletionItemProvider(LANGUAGES, new AuthProvider, ...TRIGGER_CHARACTERS));
 			context.subscriptions.push(vscode.languages.registerCompletionItemProvider(LANGUAGES, new AssetProvider, ...TRIGGER_CHARACTERS));
-			context.subscriptions.push(vscode.languages.registerCompletionItemProvider(LANGUAGES, new EloquentProvider, ...TRIGGER_CHARACTERS));
+			context.subscriptions.push(vscode.languages.registerCompletionItemProvider(LANGUAGES, new EloquentProvider, ...TRIGGER_CHARACTERS.concat(['>'])));
 		}
 	}
 }

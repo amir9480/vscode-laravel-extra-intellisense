@@ -69,6 +69,18 @@ You also can use `/` instead of `.` as directory separator for view autocomplete
 ### LaravelExtraIntellisense.modelsPaths
 Array of paths including your models. (Default: `["app", "app/Models"]`)
 
+### LaravelExtraIntellisense.modelVariables
+Variable names that should provide autocomplete with specific model class. Finding variable type (especially in views) is not easy so you need to manually define variable types.
+
+Example: The Following setting provides auto completion each time you type `discountedProduct->` with `App\Models\Product` model attributes.
+```json
+"LaravelExtraIntellisense.modelVariables": {
+    "discountedProduct": "App\\Models\\Product"
+}
+```
+> All `camelCase` and `snake_case` of model names provide autocomplete by default.
+> For example `productDiscount` and `product_discount` provides member autocomplete from `App\Models\ProductDiscount` model.
+
 #### Sample config to use docker
 This is a simple configuration to use via [Laradock](https://github.com/laradock/laradock).
 It is possible to use this extension with other docker images or even other virtual machines.

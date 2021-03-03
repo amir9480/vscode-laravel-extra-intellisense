@@ -29,65 +29,130 @@ export default class EloquentProvider implements vscode.CompletionItemProvider {
         let sourceCode = document.getText();
         let sourceBeforeCursor = sourceCode.substr(0, document.offsetAt(position));
         var isFactory = sourceBeforeCursor.includes("extends Factory") || sourceBeforeCursor.includes("$factory->define(");
-        if (func === null && isFactory === false) {
-            return out;
-        }
         var match = null;
+        var objectName = "";
         var modelName = "";
         var modelClass = "";
-        if (func) {
-            let modelNameRegex = /([A-Za-z0-9_\\]+)::[^:]+$/g;
-            var namespaceRegex = /namespace\s+(.+);/g;
-            var namespace = "";
-            while ((match = modelNameRegex.exec(sourceBeforeCursor)) !== null) {
-                modelName = match[1];
-            }
-            if ((match = namespaceRegex.exec(sourceBeforeCursor)) !== null) {
-                namespace = match[1];
-            }
-            var modelClassRegex = new RegExp("use (.+)" + modelName + ";", "g");
-            if (modelName.substr(0, 1) === '\\') {
-                modelClass = modelName.substr(1);
-            } else if ((match = modelClassRegex.exec(sourceBeforeCursor)) !== null) {
-                modelClass = match[1] + modelName;
+        if (func != null || isFactory) {
+            if (func) {
+                let modelNameRegex = /([A-z0-9_\\]+)::[^:;]+$/g;
+                var namespaceRegex = /namespace\s+(.+);/g;
+                var namespace = "";
+                while ((match = modelNameRegex.exec(sourceBeforeCursor)) !== null) {
+                    modelName = match[1];
+                }
+                if (modelName.length === 0) {
+                    let variableNameRegex = /(\$([A-z0-9_\\]+))->[^;]+$/g;
+                    while ((match = variableNameRegex.exec(sourceBeforeCursor)) !== null) {
+                        objectName = match[2];
+                    }
+                    if (objectName.length > 0) {
+                        modelNameRegex = new RegExp("\\$" + objectName + "\\s*=\\s*([A-z0-9_\\\\]+)::[^:]", "g");
+                        while ((match = modelNameRegex.exec(sourceBeforeCursor)) !== null) {
+                            modelName = match[1];
+                        }
+                    }
+                }
+                if ((match = namespaceRegex.exec(sourceBeforeCursor)) !== null) {
+                    namespace = match[1];
+                }
+                modelClass = this.getModelClass(modelName, sourceBeforeCursor);
             } else {
-                modelClass = namespace + "\\" + modelName;
+                var factoryModelClassRegex = /(protected \$model = ([A-Za-z0-9_\\]+)::class;)|(\$factory->define\(\s*([A-Za-z0-9_\\]+)::class)/g
+                if ((match = factoryModelClassRegex.exec(sourceBeforeCursor)) !== null) {
+                    if (typeof match[4] !== 'undefined') { // Laravel 7 <
+                        modelName = match[4];
+                    } else { // Laravel >= 8
+                        modelName = match[2];
+                    }
+                }
+                modelClass = this.getModelClass(modelName, sourceBeforeCursor);
+            }
+
+            if (typeof this.models[modelClass] !== 'undefined') {
+                if (func && Helpers.relationMethods.some((fn:string) => func.function.includes(fn))) {
+                    out = out.concat(this.getCompletionItems(document, position, this.models[modelClass].relations));
+                } else {
+                    out = out.concat(this.getCompletionItems(document, position, this.models[modelClass].attributes));
+                }
             }
         } else {
-            var factoryModelClassRegex = /(protected \$model = ([A-Za-z0-9_\\]+)::class;)|(\$factory->define\(\s*([A-Za-z0-9_\\]+)::class)/g
-            if ((match = factoryModelClassRegex.exec(sourceBeforeCursor)) !== null) {
-                if (typeof match[4] !== 'undefined') { // Laravel 7 <
-                    modelName = match[4];
-                } else { // Laravel >= 8
-                    modelName = match[2];
+            let isArrayObject = false;
+            let objectRegex = /(\$?([A-z0-9_\[\]]+)|(Auth::user\(\)))\-\>[A-z0-9_]*$/g;
+            while ((match = objectRegex.exec(sourceBeforeCursor)) !== null) {
+                objectName = typeof match[2] !== 'undefined' ? match[2] : match[3];
+            }
+            if (objectName.match(/\$?[A-z0-9_]+\[.+\].*$/g)) {
+                isArrayObject = true;
+                objectName = objectName.replace(/\[.+\].*$/g, '');
+            }
+            if (objectName.length > 0 && objectName != 'Auth::user()') {
+                let modelNameRegex = new RegExp("\\$" + objectName + "\\s*=\\s*([A-z0-9_\\\\]+)::[^:;]", "g");
+                while ((match = modelNameRegex.exec(sourceBeforeCursor)) !== null) {
+                    modelName = match[1];
+                }
+                modelClass = this.getModelClass(modelName, sourceBeforeCursor);
+            }
+            if (modelClass == 'Auth' || objectName == 'Auth::user()') {
+                if (typeof this.models['App\\User'] !== 'undefined') {
+                    out = out.concat(this.getModelAttributesCompletionItems(document, position, 'App\\User'));
+                } else if (typeof this.models['App\\Models\\User'] !== 'undefined') {
+                    out = out.concat(this.getModelAttributesCompletionItems(document, position, 'App\\Models\\User'));
                 }
             }
-            var modelClassRegex = new RegExp("use (.+)" + modelName + ";", "g");
-            if (modelName.substr(0, 1) === '\\') {
-                modelClass = modelName.substr(1);
-            } else if ((match = modelClassRegex.exec(sourceBeforeCursor)) !== null) {
-                modelClass = match[1] + modelName;
-            } else {
-                modelClass = modelName;
+            let customVariables = vscode.workspace.getConfiguration("LaravelExtraIntellisense").get<any>('modelVariables', {});
+            for (let customVariable in customVariables) {
+                if (customVariable === objectName && typeof this.models[customVariables[customVariable]] !== 'undefined') {
+                    out = out.concat(this.getModelAttributesCompletionItems(document, position, customVariables[customVariable]));
+                }
+            }
+            for (let i in this.models) {
+                if (i == modelClass ||
+                    (this.models[i].camelCase == objectName || this.models[i].snakeCase == objectName) ||
+                    (isArrayObject == true && (this.models[i].pluralCamelCase == objectName || this.models[i].pluralSnakeCase == objectName))
+                ) {
+                    out = out.concat(this.getModelAttributesCompletionItems(document, position, i));
+                }
             }
         }
+        out = out.filter((v, i, a) => a.map((ai) => ai.label).indexOf(v.label) === i); // Remove duplicate items
+        return out;
+    }
 
+    getModelClass(modelName: string, sourceBeforeCursor: string) {
+        let match = null;
+        let modelClass = "";
+        if (modelName.length === 0) {
+            return "";
+        }
+        var modelClassRegex = new RegExp("use (.+)" + modelName + ";", "g");
+        if (modelName.substr(0, 1) === '\\') {
+            modelClass = modelName.substr(1);
+        } else if ((match = modelClassRegex.exec(sourceBeforeCursor)) !== null) {
+            modelClass = match[1] + modelName;
+        } else {
+            modelClass = modelName;
+        }
+        return modelClass;
+    }
+
+    getModelAttributesCompletionItems(document: vscode.TextDocument, position: vscode.Position, modelClass: string) : Array<vscode.CompletionItem> {
+        let out: Array<vscode.CompletionItem> = [];
         if (typeof this.models[modelClass] !== 'undefined') {
-            if (func && ['whereHas', 'whereDoesntHave'].some((fn:string) => func.function.includes(fn))) {
-                for (let relation of this.models[modelClass].relations) {
-                    var completeItem = new vscode.CompletionItem(relation, vscode.CompletionItemKind.Value);
-                    completeItem.range = document.getWordRangeAtPosition(position, Helpers.wordMatchRegex);
-                    out.push(completeItem);
-                }
-            } else {
-                for (let attribute of this.models[modelClass].attributes) {
-                    var completeItem = new vscode.CompletionItem(attribute, vscode.CompletionItemKind.Value);
-                    completeItem.range = document.getWordRangeAtPosition(position, Helpers.wordMatchRegex);
-                    out.push(completeItem);
-                }
-            }
+            out = out.concat(this.getCompletionItems(document, position, this.models[modelClass].attributes));
+            out = out.concat(this.getCompletionItems(document, position, this.models[modelClass].mutators, vscode.CompletionItemKind.Constant));
+            out = out.concat(this.getCompletionItems(document, position, this.models[modelClass].relations, vscode.CompletionItemKind.Value));
         }
+        return out;
+    }
 
+    getCompletionItems(document: vscode.TextDocument, position: vscode.Position, items: Array<string>, type: vscode.CompletionItemKind =  vscode.CompletionItemKind.Property) : Array<vscode.CompletionItem> {
+        let out: Array<vscode.CompletionItem> = [];
+        for (let item of items) {
+            var completeItem = new vscode.CompletionItem(item, type);
+            completeItem.range = document.getWordRangeAtPosition(position, Helpers.wordMatchRegex);
+            out.push(completeItem);
+        }
         return out;
     }
 
@@ -99,7 +164,7 @@ export default class EloquentProvider implements vscode.CompletionItemProvider {
         self.timer = setTimeout(function () {
             self.loadModels();
             self.timer = null;
-        }, 2000);
+        }, 5000);
     }
 
     loadModels() {
@@ -115,16 +180,26 @@ export default class EloquentProvider implements vscode.CompletionItemProvider {
                     "   }" +
                     "}" +
                     "$modelClasses = array_values(array_filter(get_declared_classes(), function ($declaredClass) {" +
-                    "   return is_subclass_of($declaredClass, 'Illuminate\\Database\\Eloquent\\Model');" +
+                    "   return is_subclass_of($declaredClass, 'Illuminate\\Database\\Eloquent\\Model') && $declaredClass != 'Illuminate\\Database\\Eloquent\\Relations\\Pivot' && $declaredClass != 'Illuminate\\Foundation\\Auth\\User';" +
                     "}));" +
                     "$output = [];" +
                     "foreach ($modelClasses as $modelClass) {" +
-                    "   $output[$modelClass] = ['attributes' => [], 'relations' => []];" +
+                    "   $classReflection = new \\ReflectionClass($modelClass);" +
+                    "   $output[$modelClass] = [" +
+                    "       'name' => $classReflection->getShortName()," +
+                    "       'camelCase' => Illuminate\\Support\\Str::camel($classReflection->getShortName())," +
+                    "       'snakeCase' => Illuminate\\Support\\Str::snake($classReflection->getShortName())," +
+                    "       'pluralCamelCase' => Illuminate\\Support\\Str::camel(Illuminate\\Support\\Str::plural($classReflection->getShortName()))," +
+                    "       'pluralSnakeCase' => Illuminate\\Support\\Str::snake(Illuminate\\Support\\Str::plural($classReflection->getShortName()))," +
+                    "       'attributes' => []," +
+                    "       'mutators' => []," +
+                    "       'relations' => []" +
+                    "   ];" +
                     "   try {" +
                     "       $modelInstance = $modelClass::first();" +
                     "       $output[$modelClass]['attributes'] = array_values(array_unique(array_merge(app($modelClass)->getFillable(), array_keys($modelInstance ? $modelInstance->getAttributes() : []))));" +
                     "   } catch (\\Throwable $e) {}" +
-                    "   foreach ((new \\ReflectionClass($modelClass))->getMethods() as $classMethod) {" +
+                    "   foreach ($classReflection->getMethods() as $classMethod) {" +
                     "       try {" +
                     "           if (" +
                     "                $classMethod->isStatic() == false &&" +
@@ -135,6 +210,12 @@ export default class EloquentProvider implements vscode.CompletionItemProvider {
                     "                preg_match('/belongsTo|hasMany|hasOne|morphOne|morphMany|morphTo/', implode('', array_slice(file($classMethod->getFileName()), $classMethod->getStartLine(), $classMethod->getEndLine() - $classMethod->getStartLine() - 1)))" +
                     "           ) {" +
                     "               $output[$modelClass]['relations'][] = $classMethod->getName();" +
+                    "           } elseif (" +
+                    "                substr($classMethod->getName(), 0, 3) == 'get' && " +
+                    "                substr($classMethod->getName(), -9) == 'Attribute' &&" +
+                    "                !empty(substr($classMethod->getName(), 3, -9))" +
+                    "           ) {" +
+                    "               $output[$modelClass]['mutators'][] = Illuminate\\Support\\Str::snake(substr($classMethod->getName(), 3, -9));" +
                     "           }" +
                     "       } catch (\\Throwable $e) {}" +
                     "   }" +
@@ -144,9 +225,7 @@ export default class EloquentProvider implements vscode.CompletionItemProvider {
                     "echo json_encode($output);"
                 ).then(function (result) {
                     let models = JSON.parse(result);
-                    for (let i in models) {
-                        self.models[i] = models[i];
-                    }
+                    self.models = models;
                 }).catch(function (e) {
                     console.error(e);
                 });
