@@ -81,6 +81,12 @@ Example: The Following setting provides auto completion each time you type `disc
 > All `camelCase` and `snake_case` of model names provide autocomplete by default.
 > For example `productDiscount` and `product_discount` provides member autocomplete from `App\Models\ProductDiscount` model.
 
+### LaravelExtraIntellisense.modelAttributeCase
+Change model attribute names case to `snake_case`, `camelCase` or `default`. (Default = `default`)
+
+### LaravelExtraIntellisense.modelAccessorCase
+Change model accessor names case to `snake_case`, `camelCase` or `default`. (Default = `snake`)
+
 #### Sample config to use docker
 This is a simple configuration to use via [Laradock](https://github.com/laradock/laradock).
 It is possible to use this extension with other docker images or even other virtual machines.
@@ -90,10 +96,12 @@ It is possible to use this extension with other docker images or even other virt
 "LaravelExtraIntellisense.basePathForCode": "/var/www/your-project"
 ```
 
-## Note
-> This extension runs your Laravel application automatically and periodically to get the information needed to provide autocomplete.
-> So if you have any unknown errors in your log make sure the extension not causing it.
-> Also if you writing any sensitive code in your service providers, disable the extension temporarily to prevent unwanted application executing.
+## Security Note
+This extension runs your Laravel application automatically and periodically to get the information needed to provide autocomplete.
+
+So if you have any unknown errors in your log make sure the extension not causing it.
+
+Also if you writing any sensitive code in your service providers, disable the extension temporarily to prevent unwanted application executing.
 
 ## Release Notes
 

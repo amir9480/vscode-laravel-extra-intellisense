@@ -63,6 +63,26 @@
 							"user": "App\\Models\\User"
 						},
 						"description": "Variables that should provide model autocomplete."
+					},
+					"LaravelExtraIntellisense.modelAttributeCase": {
+						"type": "string",
+						"enum": [
+							"default",
+							"snake",
+							"camel"
+						],
+						"default": "default",
+						"description": "Change attribute name case to snake or camel."
+					},
+					"LaravelExtraIntellisense.modelAccessorCase": {
+						"type": "string",
+						"enum": [
+							"default",
+							"snake",
+							"camel"
+						],
+						"default": "snake",
+						"description": "Change accessor name case to snake or camel."
 					}
 				}
 			}

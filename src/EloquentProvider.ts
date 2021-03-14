@@ -139,8 +139,8 @@ export default class EloquentProvider implements vscode.CompletionItemProvider {
     getModelAttributesCompletionItems(document: vscode.TextDocument, position: vscode.Position, modelClass: string) : Array<vscode.CompletionItem> {
         let out: Array<vscode.CompletionItem> = [];
         if (typeof this.models[modelClass] !== 'undefined') {
-            out = out.concat(this.getCompletionItems(document, position, this.models[modelClass].attributes));
-            out = out.concat(this.getCompletionItems(document, position, this.models[modelClass].mutators, vscode.CompletionItemKind.Constant));
+            out = out.concat(this.getCompletionItems(document, position, this.models[modelClass].attributes.map((attr: any) => attr[vscode.workspace.getConfiguration("LaravelExtraIntellisense").get<string>('modelAttributeCase', 'default')])));
+            out = out.concat(this.getCompletionItems(document, position, this.models[modelClass].accessors.map((attr: any) => attr[vscode.workspace.getConfiguration("LaravelExtraIntellisense").get<string>('modelAccessorCase', 'snake')]), vscode.CompletionItemKind.Constant));
             out = out.concat(this.getCompletionItems(document, position, this.models[modelClass].relations, vscode.CompletionItemKind.Value));
         }
         return out;
@@ -192,12 +192,15 @@ export default class EloquentProvider implements vscode.CompletionItemProvider {
                     "       'pluralCamelCase' => Illuminate\\Support\\Str::camel(Illuminate\\Support\\Str::plural($classReflection->getShortName()))," +
                     "       'pluralSnakeCase' => Illuminate\\Support\\Str::snake(Illuminate\\Support\\Str::plural($classReflection->getShortName()))," +
                     "       'attributes' => []," +
-                    "       'mutators' => []," +
+                    "       'accessors' => []," +
                     "       'relations' => []" +
                     "   ];" +
                     "   try {" +
                     "       $modelInstance = $modelClass::first();" +
-                    "       $output[$modelClass]['attributes'] = array_values(array_unique(array_merge(app($modelClass)->getFillable(), array_keys($modelInstance ? $modelInstance->getAttributes() : []))));" +
+                    "       $attributes = array_values(array_unique(array_merge(app($modelClass)->getFillable(), array_keys($modelInstance ? $modelInstance->getAttributes() : []))));" +
+                    "       $output[$modelClass]['attributes'] = array_map(function ($attribute) {" +
+                    "           return ['default' => $attribute, 'snake' => Illuminate\\Support\\Str::snake($attribute), 'camel' => Illuminate\\Support\\Str::camel($attribute)];" +
+                    "       }, $attributes);" +
                     "   } catch (\\Throwable $e) {}" +
                     "   foreach ($classReflection->getMethods() as $classMethod) {" +
                     "       try {" +
@@ -215,7 +218,8 @@ export default class EloquentProvider implements vscode.CompletionItemProvider {
                     "                substr($classMethod->getName(), -9) == 'Attribute' &&" +
                     "                !empty(substr($classMethod->getName(), 3, -9))" +
                     "           ) {" +
-                    "               $output[$modelClass]['mutators'][] = Illuminate\\Support\\Str::snake(substr($classMethod->getName(), 3, -9));" +
+                    "               $attributeName = substr($classMethod->getName(), 3, -9);" +
+                    "               $output[$modelClass]['accessors'][] = ['default' => $attributeName, 'snake' => Illuminate\\Support\\Str::snake($attributeName), 'camel' => Illuminate\\Support\\Str::camel($attributeName)];" +
                     "           }" +
                     "       } catch (\\Throwable $e) {}" +
                     "   }" +
