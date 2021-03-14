@@ -83,6 +83,11 @@
 						],
 						"default": "snake",
 						"description": "Change accessor name case to snake or camel."
+					},
+					"LaravelExtraIntellisense.disableBlade": {
+						"type": "boolean",
+						"default": false,
+						"description": "If you want to disable blade directives autocomplete set this to true."
 					}
 				}
 			}

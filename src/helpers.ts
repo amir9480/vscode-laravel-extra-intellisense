@@ -7,7 +7,7 @@ import * as os from 'os';
 
 export default class Helpers {
 
-	static wordMatchRegex = /[\w\d\-_\.\:\\\/]+/g;
+	static wordMatchRegex = /[\w\d\-_\.\:\\\/@]+/g;
 	static phpParser:any = null;
 	static cachedParseFunction:any = null;
 	static modelsCache: Array<string>;
@@ -289,5 +289,16 @@ export default class Helpers {
 				});
 			}
 		});
+	}
+
+	/**
+	 * Get indent space based on user configuration
+	 */
+	 static getSpacer() : string {
+		const editor = vscode.window.activeTextEditor;
+		if (editor && editor.options.insertSpaces) {
+			return ' '.repeat(<number>editor.options.tabSize);
+		}
+		return '\t';
 	}
 }

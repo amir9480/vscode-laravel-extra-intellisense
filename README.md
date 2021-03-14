@@ -87,6 +87,9 @@ Change model attribute names case to `snake_case`, `camelCase` or `default`. (De
 ### LaravelExtraIntellisense.modelAccessorCase
 Change model accessor names case to `snake_case`, `camelCase` or `default`. (Default = `snake`)
 
+### LaravelExtraIntellisense.disableBlade
+If you want to disable blade directives autocomplete set this to true.
+
 #### Sample config to use docker
 This is a simple configuration to use via [Laradock](https://github.com/laradock/laradock).
 It is possible to use this extension with other docker images or even other virtual machines.
@@ -104,6 +107,10 @@ So if you have any unknown errors in your log make sure the extension not causin
 Also if you writing any sensitive code in your service providers, disable the extension temporarily to prevent unwanted application executing.
 
 ## Release Notes
+
+### 0.6.x
+* Add blade directives autocomplete (#45).
+* Add change case option for model attributes (#46).
 
 ### 0.5.x
 * Add `asset` support.
