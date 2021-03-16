@@ -18,6 +18,7 @@ This extension provides [Laravel](https://laravel.com/) routes, views and ... au
 * [Route Middlewares](#route-middlewares)
 * Asset
 * Model Attributes (Beta!)
+* Blade directives
 
 ### Route names and route parameters
 ![Routes](./images/screenshot-route.gif)
