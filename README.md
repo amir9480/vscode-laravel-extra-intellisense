@@ -112,6 +112,8 @@ Also if you writing any sensitive code in your service providers, disable the ex
 ### 0.6.x
 * Add blade directives autocomplete (#45).
 * Add change case option for model attributes (#46).
+* Add support workspace with multiple directory (#54).
+* Add nested translations support (#54).
 
 ### 0.5.x
 * Add `asset` support.
