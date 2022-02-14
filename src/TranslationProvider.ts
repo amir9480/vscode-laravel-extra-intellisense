@@ -75,14 +75,46 @@ export default class TranslationProvider implements vscode.CompletionItemProvide
         try {
             var self = this;
             Helpers.runLaravel("echo json_encode(app('translator')->getLoader()->namespaces());")
-                .then(function (result) {
+                .then(async function (result) {
                     var tranlationNamespaces = JSON.parse(result);
                     for (let i in tranlationNamespaces) {
                         tranlationNamespaces[i + '::'] = tranlationNamespaces[i];
                         delete tranlationNamespaces[i];
                     }
-                    tranlationNamespaces[''] = Helpers.projectPath('resources/lang');
+                    let langPath = JSON.parse(await Helpers.runLaravel('echo json_encode(app()->langPath());'));
+                    tranlationNamespaces[''] = langPath;
+                    var nestedTranslationGroups = function (basePath:string, relativePath: string = '') : Array<string> {
+                        let path = basePath + '/' + relativePath;
+                        let out: Array<string> = [];
+                        if (fs.existsSync(path) && fs.lstatSync(path).isDirectory()) {
+                            fs.readdirSync(path).forEach(function (file) {
+                                if (fs.lstatSync(path + '/' + file).isFile()) {
+                                    out.push(relativePath + '/' + file.replace(/\.php/, ''));
+                                } else if (fs.lstatSync(path + '/' + file).isDirectory()) {
+                                    let nestedOut = nestedTranslationGroups(basePath, (relativePath.length > 0 ? relativePath + '/' : '') + file);
+                                    for (let nested of nestedOut) {
+                                        out.push(nested);
+                                    }
+                                }
+                            });
+                        }
+                        return out;
+                    }
                     var translationGroups:any = [];
+                    fs.readdirSync(langPath).forEach(function (langDir) {
+                        var path:any = langPath + '/' + langDir;
+                        if (fs.existsSync(path) && fs.lstatSync(path).isDirectory()) {
+                            fs.readdirSync(path).forEach(function (subDirectory) {
+                                let subDirectoryPath = path + '/' + subDirectory;
+                                if (fs.existsSync(subDirectoryPath) && fs.lstatSync(subDirectoryPath).isDirectory()) {
+                                    let nestedDirectories = nestedTranslationGroups(path, subDirectory);
+                                    for (let nestedDirectory of nestedDirectories) {
+                                        translationGroups.push(nestedDirectory);
+                                    }
+                                }
+                            });
+                        }
+                    });
                     for (let i in tranlationNamespaces) {
                         if (fs.existsSync(tranlationNamespaces[i]) && fs.lstatSync(tranlationNamespaces[i]).isDirectory()) {
                             fs.readdirSync(tranlationNamespaces[i]).forEach(function (langDir) {
