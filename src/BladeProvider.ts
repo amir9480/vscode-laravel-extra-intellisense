@@ -116,6 +116,11 @@ export default class BladeProvider implements vscode.CompletionItemProvider {
             '@dump(...)': new vscode.SnippetString('@dump(${1})'),
             '@dd(...)': new vscode.SnippetString('@dd(${1})'),
             '@lang(...)': new vscode.SnippetString('@lang(${1})'),
+            '@selected(...)': new vscode.SnippetString('@selected(${1})'),
+            '@checked(...)': new vscode.SnippetString('@checked(${1})'),
+            '@disabled(...)': new vscode.SnippetString('@disabled(${1})'),
+            '@readonly(...)': new vscode.SnippetString('@readonly(${1})'),
+            '@required(...)': new vscode.SnippetString('@required(${1})'),
 
             '@endif': new vscode.SnippetString('@endif'),
             '@enderror': new vscode.SnippetString('@enderror'),
