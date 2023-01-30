@@ -99,7 +99,7 @@ export default class BladeProvider implements vscode.CompletionItemProvider {
             '@once': new vscode.SnippetString('@production\n' + Helpers.getSpacer() + '${1}\n' + '@endonce'),
             '@yield(...)': new vscode.SnippetString('@yield(${1})'),
             '@slot(...)': new vscode.SnippetString('@slot(${1})'),
-            '@stack(...)': new vscode.SnippetString('@method(${1})'),
+            '@stack(...)': new vscode.SnippetString('@stack(${1})'),
             '@push(...)': new vscode.SnippetString('@push(${1})\n' + Helpers.getSpacer() + '${2}\n' + '@endpush'),
             '@prepend(...)': new vscode.SnippetString('@prepend(${1})\n' + Helpers.getSpacer() + '${2}\n' + '@endprepend'),
             '@php': new vscode.SnippetString('@php\n' + Helpers.getSpacer() + '${1}\n' + '@endphp'),
