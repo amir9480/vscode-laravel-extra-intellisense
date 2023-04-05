@@ -228,7 +228,7 @@ export default class Helpers {
 			out = Helpers.cachedParseFunction.out;
 		} else if (level < 6) {
 			while ((match = functionRegex.exec(text)) !== null) {
-				if (position >= match.index && position < match.index + match[0].length) {
+				if (position >= match.index && match.length > 0 && position < match.index + match[0].length) {
 					if ((match2 = inlineFunctionMatch.exec(match[0])) !== null) {
 						out = this.parseFunction(match2[3], position - (match.index + match[1].length + match[6].length + match2[1].length), level + 1);
 					} else {
