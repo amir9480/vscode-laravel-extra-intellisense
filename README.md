@@ -96,12 +96,20 @@ If you want to disable authorization autocomplete set this to true
 
 #### Sample config to use docker
 This is a simple configuration to use via [Laradock](https://github.com/laradock/laradock).
-It is possible to use this extension with other docker images or even other virtual machines.
 
 ```json
 "LaravelExtraIntellisense.phpCommand": "docker exec -w /var/www/your-project -u laradock laradock_workspace_1 php -r \"{code}\"",
 "LaravelExtraIntellisense.basePathForCode": "/var/www/your-project"
 ```
+
+Another sample for [Laravel Sail](https://laravel.com/docs/sail).
+
+```json
+"LaravelExtraIntellisense.basePathForCode": "/var/www/html",
+"LaravelExtraIntellisense.phpCommand": "docker-compose exec -w /var/www/html YOUR_SERVICE_NAME php -r \"{code}\""
+```
+
+It is possible to use this extension with other docker images or even other virtual machines.
 
 ## Security Note
 This extension runs your Laravel application automatically and periodically to get the information needed to provide autocomplete.
