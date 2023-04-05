@@ -228,10 +228,10 @@ export default class Helpers {
 			out = Helpers.cachedParseFunction.out;
 		} else if (level < 6) {
 			while ((match = functionRegex.exec(text)) !== null) {
-				if (position >= match.index && match.length > 0 && position < match.index + match[0].length) {
-					if ((match2 = inlineFunctionMatch.exec(match[0])) !== null) {
+				if (position >= match.index && match[0] && position < match.index + match[0].length) {
+					if ((match2 = inlineFunctionMatch.exec(match[0])) !== null && typeof match2[3] === 'string' && typeof match[1] === 'string' && typeof match[6] === 'string' && typeof match2[1] === 'string') {
 						out = this.parseFunction(match2[3], position - (match.index + match[1].length + match[6].length + match2[1].length), level + 1);
-					} else {
+					} else if (typeof match[1] === 'string' && typeof match[6]=== 'string' && typeof match[7]=== 'string') {
 						var textParameters = [];
 						var paramIndex = null;
 						var paramIndexCounter = 0;
@@ -244,7 +244,7 @@ export default class Helpers {
 
 						while ((match2 = paramsRegex.exec(match[7])) !== null) {
 							textParameters.push(match2[3]);
-							if (paramsPosition >= match2.index && paramsPosition <= match2.index + match2[0].length) {
+							if (paramsPosition >= match2.index && typeof match2[0] === 'string' && paramsPosition <= match2.index + match2[0].length) {
 								paramIndex = paramIndexCounter;
 							}
 							paramIndexCounter++;
