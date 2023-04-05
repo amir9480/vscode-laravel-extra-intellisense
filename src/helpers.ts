@@ -4,7 +4,7 @@ import * as vscode from 'vscode';
 import * as cp from 'child_process';
 import * as fs from 'fs';
 import * as os from 'os';
-import { resolve, join } from 'path';
+import { resolve } from 'path';
 
 export default class Helpers {
 
@@ -13,6 +13,7 @@ export default class Helpers {
 	static cachedParseFunction:any = null;
 	static modelsCache: Array<string>;
 	static modelsCacheTime: number = 0;
+	static outputChannel: vscode.OutputChannel|null = null;
 
 	static tags:any = {
 		config: 	{classes: ['Config']	, functions: ['config']},
@@ -51,7 +52,7 @@ export default class Helpers {
 				basePath = resolve(vscode.workspace.workspaceFolders[0].uri.fsPath, basePath);
 			}
 			basePath = basePath.replace(/[\/\\]$/, "");
-			return join(basePath, path);
+			return basePath + path;
 		}
 
 		let basePathForCode = vscode.workspace.getConfiguration("LaravelExtraIntellisense").get<string>('basePathForCode');
@@ -60,7 +61,7 @@ export default class Helpers {
 				basePathForCode = resolve(vscode.workspace.workspaceFolders[0].uri.fsPath, basePathForCode);
 			}
 			basePathForCode = basePathForCode.replace(/[\/\\]$/, "");
-			return join(basePathForCode, path);
+			return basePathForCode + path;
 		}
 
 		if (vscode.workspace.workspaceFolders instanceof Array && vscode.workspace.workspaceFolders.length > 0) {
@@ -146,13 +147,19 @@ export default class Helpers {
 		let command = vscode.workspace.getConfiguration("LaravelExtraIntellisense").get<string>('phpCommand') ?? "php -r \"{code}\"";
 		command = command.replace("{code}", code);
 		let out = new Promise<string>(function (resolve, error) {
-			cp.exec(command, function (err, stdout, stderr) {
-				if (stdout.length > 0) {
-					resolve(stdout);
-				} else {
-					error(stderr);
+			cp.exec(command,
+				{ cwd: vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0 ? vscode.workspace.workspaceFolders[0].uri.fsPath : undefined },
+				function (err, stdout, stderr) {
+					if (stdout.length > 0) {
+						resolve(stdout);
+					} else {
+						if (Helpers.outputChannel !== null) {
+							Helpers.outputChannel.appendLine("Laravel extra intellisense Error: " + stderr);
+						}
+						error(stderr);
+					}
 				}
-			});
+			);
 		});
 		return out;
 	}

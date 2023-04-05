@@ -22,6 +22,11 @@ export function activate(context: vscode.ExtensionContext) {
 	showWelcomeMessage(context);
 	if (vscode.workspace.workspaceFolders instanceof Array && vscode.workspace.workspaceFolders.length > 0) {
 		if (fs.existsSync(Helpers.projectPath("artisan"))) {
+			if (Helpers.outputChannel === null) {
+				Helpers.outputChannel = vscode.window.createOutputChannel("Laravel Extra Intellisense");
+				Helpers.outputChannel.appendLine("Laravel Extra Intellisense Started...");
+			}
+
 			const LANGUAGES =
 			[
 				{ scheme: 'file', language: 'php' },
