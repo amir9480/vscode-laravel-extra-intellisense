@@ -88,6 +88,11 @@
 						"type": "boolean",
 						"default": false,
 						"description": "If you want to disable blade directives autocomplete set this to true."
+					},
+					"LaravelExtraIntellisense.disableAuth": {
+						"type": "boolean",
+						"default": false,
+						"description": "If you want to disable authorization autocomplete set this to true."
 					}
 				}
 			}

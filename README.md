@@ -91,6 +91,9 @@ Change model accessor names case to `snake_case`, `camelCase` or `default`. (Def
 ### LaravelExtraIntellisense.disableBlade
 If you want to disable blade directives autocomplete set this to true.
 
+### LaravelExtraIntellisense.disableAuth
+If you want to disable authorization autocomplete set this to true
+
 #### Sample config to use docker
 This is a simple configuration to use via [Laradock](https://github.com/laradock/laradock).
 It is possible to use this extension with other docker images or even other virtual machines.

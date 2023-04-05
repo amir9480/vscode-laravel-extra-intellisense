@@ -10,6 +10,9 @@ export default class AuthProvider implements vscode.CompletionItemProvider {
 
     constructor () {
         var self = this;
+        if (vscode.workspace.getConfiguration("LaravelExtraIntellisense").get<boolean>('disableAuth', false)) {
+            return;
+        }
         self.loadAbilities();
         setInterval(function () {
             self.loadAbilities();
