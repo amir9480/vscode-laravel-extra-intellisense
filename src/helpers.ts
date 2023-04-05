@@ -4,6 +4,7 @@ import * as vscode from 'vscode';
 import * as cp from 'child_process';
 import * as fs from 'fs';
 import * as os from 'os';
+import { resolve, join } from 'path';
 
 export default class Helpers {
 
@@ -46,14 +47,20 @@ export default class Helpers {
 
 		let basePath = vscode.workspace.getConfiguration("LaravelExtraIntellisense").get<string>('basePath');
 		if (forCode === false && basePath && basePath.length > 0) {
+			if (basePath.startsWith('.') && vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0) {
+				basePath = resolve(vscode.workspace.workspaceFolders[0].uri.fsPath, basePath);
+			}
 			basePath = basePath.replace(/[\/\\]$/, "");
-			return basePath + path;
+			return join(basePath, path);
 		}
 
 		let basePathForCode = vscode.workspace.getConfiguration("LaravelExtraIntellisense").get<string>('basePathForCode');
 		if (forCode && basePathForCode && basePathForCode.length > 0) {
+			if (basePathForCode.startsWith('.') && vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0) {
+				basePathForCode = resolve(vscode.workspace.workspaceFolders[0].uri.fsPath, basePathForCode);
+			}
 			basePathForCode = basePathForCode.replace(/[\/\\]$/, "");
-			return basePathForCode + path;
+			return join(basePathForCode, path);
 		}
 
 		if (vscode.workspace.workspaceFolders instanceof Array && vscode.workspace.workspaceFolders.length > 0) {
