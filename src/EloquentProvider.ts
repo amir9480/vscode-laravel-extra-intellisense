@@ -142,6 +142,7 @@ export default class EloquentProvider implements vscode.CompletionItemProvider {
             out = out.concat(this.getCompletionItems(document, position, this.models[modelClass].attributes.map((attr: any) => attr[vscode.workspace.getConfiguration("LaravelExtraIntellisense").get<string>('modelAttributeCase', 'default')])));
             out = out.concat(this.getCompletionItems(document, position, this.models[modelClass].accessors.map((attr: any) => attr[vscode.workspace.getConfiguration("LaravelExtraIntellisense").get<string>('modelAccessorCase', 'snake')]), vscode.CompletionItemKind.Constant));
             out = out.concat(this.getCompletionItems(document, position, this.models[modelClass].relations, vscode.CompletionItemKind.Value));
+            out = out.concat(this.getCompletionItems(document, position, this.models[modelClass].scopes, vscode.CompletionItemKind.Value));
         }
         return out;
     }
@@ -193,6 +194,7 @@ export default class EloquentProvider implements vscode.CompletionItemProvider {
                 "       'pluralCamelCase' => Illuminate\\Support\\Str::camel(Illuminate\\Support\\Str::plural($classReflection->getShortName()))," +
                 "       'pluralSnakeCase' => Illuminate\\Support\\Str::snake(Illuminate\\Support\\Str::plural($classReflection->getShortName()))," +
                 "       'attributes' => []," +
+                "       'scopes' => []," +
                 "       'accessors' => []," +
                 "       'relations' => []" +
                 "   ];" +
@@ -221,10 +223,17 @@ export default class EloquentProvider implements vscode.CompletionItemProvider {
                 "           ) {" +
                 "               $attributeName = substr($classMethod->getName(), 3, -9);" +
                 "               $output[$modelClass]['accessors'][] = ['default' => $attributeName, 'snake' => Illuminate\\Support\\Str::snake($attributeName), 'camel' => Illuminate\\Support\\Str::camel($attributeName)];" +
+                "           } elseif (" +
+                "                substr($classMethod->getName(), 0, 5) == 'scope' && " +
+                "                !empty(substr($classMethod->getName(), 5))" +
+                "           ) {" +
+                "               $attributeName = substr($classMethod->getName(), 5);" +
+                "               $output[$modelClass]['scopes'][] = Illuminate\\Support\\Str::camel($attributeName);" +
                 "           }" +
                 "       } catch (\\Throwable $e) {}" +
                 "   }" +
                 "   sort($output[$modelClass]['attributes']);" +
+                "   sort($output[$modelClass]['scopes']);" +
                 "   sort($output[$modelClass]['relations']);" +
                 "}" +
                 "echo json_encode($output);"
