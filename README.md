@@ -175,12 +175,6 @@ Also if you writing any sensitive code in your service providers, disable the ex
 * Blade bug fix.
 * Add route autocomplete.
 
-## Donation
-
-<a href="https://github.com/amir9480/amir9480/blob/master/donation.md">
-    <img src="https://raw.githubusercontent.com/amir9480/amir9480/master/donate.png" width="300">
-</a>
-
 ## Recommended extensions
 * [PHP Intelephense](https://marketplace.visualstudio.com/items?itemName=bmewburn.vscode-intelephense-client)
 * [PHPCS](https://marketplace.visualstudio.com/items?itemName=ikappas.phpcs)
