@@ -108,6 +108,7 @@ Another sample for [Laravel Sail](https://laravel.com/docs/sail).
 "LaravelExtraIntellisense.basePathForCode": "/var/www/html",
 "LaravelExtraIntellisense.phpCommand": "docker-compose exec -w /var/www/html YOUR_SERVICE_NAME php -r \"{code}\""
 ```
+Default YOUR_SERVICE_NAME for Laravel sail is `laravel.test`.
 
 It is possible to use this extension with other docker images or even other virtual machines.
 
