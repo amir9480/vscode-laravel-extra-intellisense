@@ -2,7 +2,7 @@
 	"name": "laravel-extra-intellisense",
 	"displayName": "Laravel Extra Intellisense",
 	"description": "better intellisense for laravel projects.",
-	"version": "0.6.3",
+	"version": "0.6.4",
 	"publisher": "amiralizadeh9480",
 	"icon": "images/icon.png",
 	"engines": {
