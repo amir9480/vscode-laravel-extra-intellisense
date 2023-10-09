@@ -18,7 +18,7 @@ export default class Helpers {
 	static tags:any = {
 		config: 	{classes: ['Config']	, functions: ['config']},
 		mix: 		{classes: []			, functions: ['mix']},
-		route: 		{classes: ['Route']		, functions: ['route']},
+		route: 		{classes: ['Route']		, functions: ['route', 'signedRoute']},
 		trans: 		{classes: ['Lang']		, functions: ['__', 'trans', '@lang']},
 		validation:	{classes: ['Validator'] , functions: ['validate', 'sometimes', 'rules']},
 		view: 		{classes: ['View']		, functions: ['view', 'markdown', 'links', '@extends', '@component', '@include', '@each']},
