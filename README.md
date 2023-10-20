@@ -60,6 +60,7 @@ Default:
 
 ### LaravelExtraIntellisense.basePath
 Base path of your Laravel application. useful if your Laravel project is not at the root of you project directory.
+> If the base path starts with `.` (like `./src`) it will be considered a relative path otherwise it will be considered an absolute path.
 
 ### LaravelExtraIntellisense.basePathForCode
 Same as `LaravelExtraIntellisense.basePath` but this one using for `require_once` in generated PHP codes.
