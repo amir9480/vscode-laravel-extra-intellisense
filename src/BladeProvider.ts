@@ -42,7 +42,8 @@ export default class BladeProvider implements vscode.CompletionItemProvider {
                 "        $out[] = ['name' => $name, 'hasParams' => (new ReflectionMethod($customDirective[0], $customDirective[1]))->getNumberOfParameters() >= 1];" +
                 "    }" +
                 "}" +
-                "echo json_encode($out);"
+                "echo json_encode($out);",
+                "Custom Blade Directives"
                 )
                 .then(function (result) {
                     var customDirectives = JSON.parse(result);

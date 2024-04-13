@@ -13,7 +13,9 @@ export default class Helpers {
 	static cachedParseFunction:any = null;
 	static modelsCache: Array<string>;
 	static modelsCacheTime: number = 0;
-	static outputChannel: vscode.OutputChannel|null = null;
+	static outputChannel: vscode.LogOutputChannel|null = null;
+	static lastErrorMessage: number = 0;
+	static disableErrorMessage: boolean = false;
 
 	static tags:any = {
 		config: 	{classes: ['Config']	, functions: ['config']},
@@ -78,12 +80,27 @@ export default class Helpers {
 		return self.indexOf(value) === index;
 	}
 
+	static showErrorPopup() {
+		if (Helpers.disableErrorMessage == false && Helpers.lastErrorMessage + 10 < Date.now()/1000) {
+			Helpers.lastErrorMessage = Date.now()/1000;
+
+			vscode.window.showErrorMessage('Laravel Extra Intellisense error', 'View Error', 'Don\'t show again')
+				.then(function (val: string | undefined) {
+					if (val === 'Don\'t show again') {
+						Helpers.disableErrorMessage = true;
+					} else if (val === 'View Error') {
+						Helpers.outputChannel?.show(true);
+					}
+				});
+		}
+	}
+
 	/**
 	 * Boot laravel and run simple php code.
 	 *
 	 * @param code
 	 */
-	static runLaravel(code: string) : Promise<string> {
+	static runLaravel(code: string, description: string|null = null) : Promise<string> {
 		code = code.replace(/(?:\r\n|\r|\n)/g, ' ');
 		if (fs.existsSync(Helpers.projectPath("vendor/autoload.php")) && fs.existsSync(Helpers.projectPath("bootstrap/app.php"))) {
 			var command =
@@ -96,7 +113,7 @@ export default class Helpers {
 				"	public function boot()" +
 				"	{" +
 				"       if (method_exists($this->app['log'], 'setHandlers')) {" +
-				"			$this->app['log']->setHandlers([new \\Monolog\\Handler\\NullHandler()]);" +
+				"			$this->app['log']->setHandlers([new \\Monolog\\Handler\\ProcessHandler()]);" +
 				"		}" +
 				"	}" +
 				"}" +
@@ -107,14 +124,18 @@ export default class Helpers {
 					"$input = new Symfony\\Component\\Console\\Input\\ArgvInput," +
 					"new Symfony\\Component\\Console\\Output\\ConsoleOutput" +
 				");" +
-				"echo '___VSCODE_LARAVEL_EXTRA_INSTELLISENSE_OUTPUT___';" +
-				 code +
-				"echo '___VSCODE_LARAVEL_EXTRA_INSTELLISENSE_END_OUTPUT___';";
+				"if ($status == 0) {" +
+				"	echo '___VSCODE_LARAVEL_EXTRA_INSTELLISENSE_OUTPUT___';" +
+					code +
+				"	echo '___VSCODE_LARAVEL_EXTRA_INSTELLISENSE_END_OUTPUT___';" +
+				"}" +
+				"$kernel->terminate($input, $status);" +
+				"exit($status);"
 
 			var self = this;
 
 			return new Promise(function (resolve, error) {
-				self.runPhp(command)
+				self.runPhp(command, description)
 					.then(function (result: string) {
 						var out : string | null | RegExpExecArray = result;
 						out = /___VSCODE_LARAVEL_EXTRA_INSTELLISENSE_OUTPUT___(.*)___VSCODE_LARAVEL_EXTRA_INSTELLISENSE_END_OUTPUT___/g.exec(out);
@@ -122,6 +143,9 @@ export default class Helpers {
 							resolve(out[1]);
 						} else {
 							error("PARSE ERROR: " + result);
+
+							Helpers.outputChannel?.error("Laravel Extra Intellisense Parse Error:\n " + (description ?? '') + '\n\n' + result);
+							Helpers.showErrorPopup();
 						}
 					})
 					.catch(function (e : Error) {
@@ -137,26 +161,33 @@ export default class Helpers {
 	 *
 	 * @param code
 	 */
-	static async runPhp(code: string) : Promise<string> {
+	static async runPhp(code: string, description: string|null = null) : Promise<string> {
 		code = code.replace(/\"/g, "\\\"");
 		if (['linux', 'openbsd', 'sunos', 'darwin'].some(unixPlatforms => os.platform().includes(unixPlatforms))) {
 			code = code.replace(/\$/g, "\\$");
 			code = code.replace(/\\\\'/g, '\\\\\\\\\'');
 			code = code.replace(/\\\\"/g, '\\\\\\\\\"');
 		}
-		let command = vscode.workspace.getConfiguration("LaravelExtraIntellisense").get<string>('phpCommand') ?? "php -r \"{code}\"";
-		command = command.replace("{code}", code);
+		let commandTemplate = vscode.workspace.getConfiguration("LaravelExtraIntellisense").get<string>('phpCommand') ?? "php -r \"{code}\"";
+		let command = commandTemplate.replace("{code}", code);
 		let out = new Promise<string>(function (resolve, error) {
+			if (description != null) {
+				Helpers.outputChannel?.info("Laravel Extra Intellisense command started: " + description);
+			}
+
 			cp.exec(command,
 				{ cwd: vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0 ? vscode.workspace.workspaceFolders[0].uri.fsPath : undefined },
 				function (err, stdout, stderr) {
-					if (stdout.length > 0) {
+					if (err == null) {
+						if (description != null) {
+							Helpers.outputChannel?.info("Laravel Extra Intellisense Resolved: " + description);
+						}
 						resolve(stdout);
 					} else {
-						if (Helpers.outputChannel !== null) {
-							Helpers.outputChannel.appendLine("Laravel extra intellisense Error: " + stderr);
-						}
-						error(stderr);
+						const errorOutput = stderr.length > 0 ? stderr : stdout;
+						Helpers.outputChannel?.error("Laravel Extra Intellisense Error:\n " + (description ?? '') + '\n\n' + errorOutput);
+						Helpers.showErrorPopup();
+						error(errorOutput);
 					}
 				}
 			);
@@ -296,7 +327,7 @@ export default class Helpers {
 					echo json_encode(array_values(array_filter(array_map(function ($name) {return app()->getNamespace().str_replace([app_path().'/', app_path().'\\\\', '.php', '/'], ['', '', '', '\\\\'], $name);}, array_merge(glob(app_path('*')), glob(app_path('Models/*')))), function ($class) {
 						return class_exists($class) && is_subclass_of($class, 'Illuminate\\\\Database\\\\Eloquent\\\\Model');
 					})));
-				`).then(function (result) {
+				`, "Application Models").then(function (result) {
 					var models = JSON.parse(result);
 					self.modelsCache = models;
 					resolve(models);

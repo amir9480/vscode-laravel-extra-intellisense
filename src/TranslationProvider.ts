@@ -74,14 +74,14 @@ export default class TranslationProvider implements vscode.CompletionItemProvide
         var translations:Array<any> = [];
         try {
             var self = this;
-            Helpers.runLaravel("echo json_encode(app('translator')->getLoader()->namespaces());")
+            Helpers.runLaravel("echo json_encode(app('translator')->getLoader()->namespaces());", "Translation namespaces")
                 .then(async function (result) {
                     var tranlationNamespaces = JSON.parse(result);
                     for (let i in tranlationNamespaces) {
                         tranlationNamespaces[i + '::'] = tranlationNamespaces[i];
                         delete tranlationNamespaces[i];
                     }
-                    let langPath = JSON.parse(await Helpers.runLaravel('echo json_encode(app()->langPath());'));
+                    let langPath = JSON.parse(await Helpers.runLaravel('echo json_encode(app()->langPath());', "Translation Path"));
                     tranlationNamespaces[''] = langPath;
                     var nestedTranslationGroups = function (basePath:string, relativePath: string = '') : Array<string> {
                         let path = basePath + '/' + relativePath;
@@ -130,14 +130,14 @@ export default class TranslationProvider implements vscode.CompletionItemProvide
                         }
                     }
                     translationGroups = translationGroups.filter(function(item:any, index:any, array:any){ return array.indexOf(item) === index; });
-                    Helpers.runLaravel("echo json_encode([" + translationGroups.map((transGroup: string) => "'" + transGroup + "' => __('" + transGroup + "')").join(",") + "]);")
+                    Helpers.runLaravel("echo json_encode([" + translationGroups.map((transGroup: string) => "'" + transGroup + "' => __('" + transGroup + "')").join(",") + "]);", "Translations inside namespaces")
                         .then(function (translationGroupsResult) {
                             translationGroups = JSON.parse(translationGroupsResult);
                             for(var i in translationGroups) {
                                 translations = translations.concat(self.getTranslations(translationGroups[i], i));
                             }
                             self.translations = translations;
-                            Helpers.runLaravel("echo json_encode(__('*'));")
+                            Helpers.runLaravel("echo json_encode(__('*'));", "Default path Translations")
                                 .then(function (jsontransResult) {
                                     translations = translations.concat(self.getTranslations(JSON.parse(jsontransResult), '').map(function (transInfo) {
                                         transInfo.name = transInfo.name.replace(/^\./, '');

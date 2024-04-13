@@ -92,7 +92,14 @@ export default class RouteProvider implements vscode.CompletionItemProvider {
         if (vscode.workspace.workspaceFolders instanceof Array && vscode.workspace.workspaceFolders.length > 0) {
             try {
                 var self = this;
-                Helpers.runLaravel("echo json_encode(array_map(function ($route) {return ['method' => implode('|', array_filter($route->methods(), function ($method) {return $method != 'HEAD';})), 'uri' => $route->uri(), 'name' => $route->getName(), 'action' => str_replace('App\\\\Http\\\\Controllers\\\\', '', $route->getActionName()), 'parameters' => $route->parameterNames()];}, app('router')->getRoutes()->getRoutes()));")
+                Helpers.runLaravel(
+                        "echo json_encode(array_map(function ($route) {" +
+                        "    return ['method' => implode('|', array_filter($route->methods(), function ($method) {" +
+                        "        return $method != 'HEAD';" +
+                        "    })), 'uri' => $route->uri(), 'name' => $route->getName(), 'action' => str_replace('App\\\\Http\\\\Controllers\\\\', '', $route->getActionName()), 'parameters' => $route->parameterNames()];" +
+                        "}, app('router')->getRoutes()->getRoutes()));",
+                        "HTTP Routes"
+                    )
                     .then(function (result) {
                         var routes = JSON.parse(result);
                         routes = routes.filter((route: any) => route !== 'null');

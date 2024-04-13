@@ -227,7 +227,8 @@ export default class EloquentProvider implements vscode.CompletionItemProvider {
                 "   sort($output[$modelClass]['attributes']);" +
                 "   sort($output[$modelClass]['relations']);" +
                 "}" +
-                "echo json_encode($output);"
+                "echo json_encode($output);",
+                "Eloquent Attributes and Relations"
             ).then(function (result) {
                 let models = JSON.parse(result);
                 self.models = models;

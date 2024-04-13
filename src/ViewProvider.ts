@@ -95,10 +95,10 @@ export default class ViewProvider implements vscode.CompletionItemProvider {
         try {
             var self = this;
             var code = "echo json_encode(app('view')->getFinder()->getHints());";
-            Helpers.runLaravel(code.replace("getHints", "getPaths"))
+            Helpers.runLaravel(code.replace("getHints", "getPaths"), "Views paths")
                 .then(function (viewPathsResult) {
                     var viewPaths = JSON.parse(viewPathsResult);
-                    Helpers.runLaravel(code)
+                    Helpers.runLaravel(code, "Views")
                         .then(function (viewNamespacesResult) {
                             var viewNamespaces = JSON.parse(viewNamespacesResult);
                             for (let i in viewPaths) {

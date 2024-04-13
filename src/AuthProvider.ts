@@ -75,7 +75,7 @@ export default class AuthProvider implements vscode.CompletionItemProvider {
                         )
                     )
                 );
-               `
+               `, 'Auth Data'
                 ).then(function (result) {
                     var abilities = JSON.parse(result);
                     self.abilities = abilities;

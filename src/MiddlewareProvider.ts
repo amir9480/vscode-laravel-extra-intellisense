@@ -53,7 +53,26 @@ export default class MiddlewareProvider implements vscode.CompletionItemProvider
             try {
                 var self = this;
                 // array_map(function ($rh) {return $rh->getName();}, array_filter((new ReflectionMethod('App\Http\Middleware\Authenticate', 'handle'))->getParameters(), function ($rc) {return $rc->getName() != 'request' && $rc->getName() != 'next';}))
-                Helpers.runLaravel("$middlewares = array_merge(app('Illuminate\\Contracts\\Http\\Kernel')->getMiddlewareGroups(), app('Illuminate\\Contracts\\Http\\Kernel')->getRouteMiddleware());foreach($middlewares as $key => &$value) {if (is_array($value)){$value = null;}else{$parameters = array_filter((new ReflectionMethod($value, 'handle'))->getParameters(), function ($rc) {return $rc->getName() != 'request' && $rc->getName() != 'next';});$value=implode(',', array_map(function ($rh) {return $rh->getName().($rh->isVariadic()?'...':'');}, $parameters));if(empty($value)){$value=null;}};}echo json_encode($middlewares);")
+                Helpers.runLaravel(
+                        "$middlewares = array_merge(app('Illuminate\\Contracts\\Http\\Kernel')->getMiddlewareGroups(), app('Illuminate\\Contracts\\Http\\Kernel')->getRouteMiddleware());" +
+                        "foreach ($middlewares as $key => &$value) {" +
+                        "    if (is_array($value)) {" +
+                        "        $value = null;" +
+                        "    } else {" +
+                        "        $parameters = array_filter((new ReflectionMethod($value, 'handle'))->getParameters(), function ($rc) {" +
+                        "            return $rc->getName() != 'request' && $rc->getName() != 'next';" +
+                        "        });" +
+                        "        $value = implode(',', array_map(function ($rh) {" +
+                        "            return $rh->getName() . ($rh->isVariadic() ? '...' : '');" +
+                        "        }, $parameters));" +
+                        "        if (empty($value)) {" +
+                        "            $value = null;" +
+                        "        }" +
+                        "    };" +
+                        "}" +
+                        "echo json_encode($middlewares);",
+                        "Middlewares"
+                    )
                     .then(function (result) {
                         let middlewares = JSON.parse(result);
                         self.middlewares = middlewares;
