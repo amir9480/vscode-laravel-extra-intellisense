@@ -80,21 +80,6 @@ export default class Helpers {
 		return self.indexOf(value) === index;
 	}
 
-	static showErrorPopup() {
-		if (Helpers.disableErrorMessage == false && Helpers.lastErrorMessage + 10 < Date.now()/1000) {
-			Helpers.lastErrorMessage = Date.now()/1000;
-
-			vscode.window.showErrorMessage('Laravel Extra Intellisense error', 'View Error', 'Don\'t show again')
-				.then(function (val: string | undefined) {
-					if (val === 'Don\'t show again') {
-						Helpers.disableErrorMessage = true;
-					} else if (val === 'View Error') {
-						Helpers.outputChannel?.show(true);
-					}
-				});
-		}
-	}
-
 	/**
 	 * Boot laravel and run simple php code.
 	 *
@@ -143,9 +128,6 @@ export default class Helpers {
 							resolve(out[1]);
 						} else {
 							error("PARSE ERROR: " + result);
-
-							Helpers.outputChannel?.error("Laravel Extra Intellisense Parse Error:\n " + (description ?? '') + '\n\n' + result);
-							Helpers.showErrorPopup();
 						}
 					})
 					.catch(function (e : Error) {
@@ -184,10 +166,7 @@ export default class Helpers {
 						}
 						resolve(stdout);
 					} else {
-						const errorOutput = stderr.length > 0 ? stderr : stdout;
-						Helpers.outputChannel?.error("Laravel Extra Intellisense Error:\n " + (description ?? '') + '\n\n' + errorOutput);
-						Helpers.showErrorPopup();
-						error(errorOutput);
+						error(err);
 					}
 				}
 			);
