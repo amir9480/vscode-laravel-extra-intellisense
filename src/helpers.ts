@@ -81,7 +81,12 @@ export default class Helpers {
 	}
 
 	static showErrorPopup() {
-		if (Helpers.disableErrorMessage == false && Helpers.lastErrorMessage + 10 < Date.now()/1000) {
+		let disableErrorAlert = vscode.workspace.getConfiguration("LaravelExtraIntellisense").get<boolean>('disableErrorAlert');
+		if (
+			disableErrorAlert == false &&
+			Helpers.disableErrorMessage == false &&
+			Helpers.lastErrorMessage + 10 < Date.now()/1000
+		) {
 			Helpers.lastErrorMessage = Date.now()/1000;
 
 			vscode.window.showErrorMessage('Laravel Extra Intellisense error', 'View Error', 'Don\'t show again')

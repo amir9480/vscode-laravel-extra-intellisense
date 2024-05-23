@@ -1,3 +1,4 @@
+
 <h1 align="center">Laravel Extra Intellisense</h1>
 
 <div align="center">
@@ -94,6 +95,9 @@ If you want to disable blade directives autocomplete set this to true.
 
 ### LaravelExtraIntellisense.disableAuth
 If you want to disable authorization autocomplete set this to true
+
+### LaravelExtraIntellisense.disableErrorAlert
+Hide error alerts when extension can't get data from your application.
 
 #### Sample config to use docker
 This is a simple configuration to use via [Laradock](https://github.com/laradock/laradock).

@@ -93,6 +93,11 @@
 						"type": "boolean",
 						"default": false,
 						"description": "If you want to disable authorization autocomplete set this to true."
+					},
+					"LaravelExtraIntellisense.disableErrorAlert": {
+						"type": "boolean",
+						"default": false,
+						"description": "Hide error alerts when extension can't get data from your application."
 					}
 				}
 			}
