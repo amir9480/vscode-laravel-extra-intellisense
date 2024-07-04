@@ -12,7 +12,7 @@ export default class RouteProvider implements vscode.CompletionItemProvider {
     private watcher: any = null;
 
 
-    constructor () {
+    constructor() {
         var self = this;
         self.loadRoutes();
         self.loadControllers();
@@ -25,19 +25,33 @@ export default class RouteProvider implements vscode.CompletionItemProvider {
     }
 
     provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, context: vscode.CompletionContext): Array<vscode.CompletionItem> {
-        var out:Array<vscode.CompletionItem> = [];
+        var out: Array<vscode.CompletionItem> = [];
         var func = Helpers.parseDocumentFunction(document, position);
         if (func === null) {
             return out;
         }
 
-        if (func && ((func.class && Helpers.tags.route.classes.some((cls:string) => func.class.includes(cls))) || Helpers.tags.route.functions.some((fn:string) => func.function.includes(fn)))) {
-            if (func.class === 'Route' && ['get', 'post', 'put', 'patch', 'delete', 'options', 'any', 'match'].some((fc:string) => func.function.includes(fc))) {
+        if (func && ((func.class && Helpers.tags.route.classes.some((cls: string) => func.class.includes(cls))) || Helpers.tags.route.functions.some((fn: string) => func.function.includes(fn)))) {
+            if (func.class === 'Route' && ['get', 'post', 'put', 'patch', 'delete', 'options', 'any', 'match'].some((fc: string) => func.function.includes(fc))) {
                 if ((func.function === 'match' && func.paramIndex === 2) || (func.function !== 'match' && func.paramIndex === 1)) {
+                    const linePrefix = document.lineAt(position).text.substr(0, position.character);
+                    const insideArray = linePrefix.includes('[');
+
                     // Route action autocomplete.
                     for (let i in this.controllers) {
                         if (typeof this.controllers[i] === "string" && this.controllers[i].length > 0) {
-                            var compeleteItem2 = new vscode.CompletionItem(this.controllers[i], vscode.CompletionItemKind.Enum);
+                            let compeleteItem2: vscode.CompletionItem;
+                            if (insideArray) {
+                                // Laravel >= 8 way
+                                const [namespace, action] = this.controllers[i].split('@');
+                                compeleteItem2 = new vscode.CompletionItem(this.controllers[i], vscode.CompletionItemKind.Enum);
+                                compeleteItem2.insertText = `${namespace}::class, '${action}'`;
+
+                                compeleteItem2.additionalTextEdits = this.ensureImport(document, namespace);
+                            } else {
+                                // Laravel < 8 way
+                                compeleteItem2 = new vscode.CompletionItem(this.controllers[i], vscode.CompletionItemKind.Enum);
+                            }
                             compeleteItem2.range = document.getWordRangeAtPosition(position, Helpers.wordMatchRegex);
                             out.push(compeleteItem2);
                         }
@@ -64,16 +78,54 @@ export default class RouteProvider implements vscode.CompletionItemProvider {
                         var compeleteItem3 = new vscode.CompletionItem(this.routes[i].name, vscode.CompletionItemKind.Enum);
                         compeleteItem3.range = document.getWordRangeAtPosition(position, Helpers.wordMatchRegex);
                         compeleteItem3.detail = this.routes[i].action +
-                                                "\n\n" +
-                                                this.routes[i].method +
-                                                ":" +
-                                                this.routes[i].uri;
+                            "\n\n" +
+                            this.routes[i].method +
+                            ":" +
+                            this.routes[i].uri;
                         out.push(compeleteItem3);
                     }
                 }
             }
         }
         return out;
+    }
+
+    ensureImport(document: vscode.TextDocument, namespace: string): vscode.TextEdit[] {
+        const importStatement = `use App\\Http\\Controllers\\${namespace};\n`;
+        const text = document.getText();
+        const importRegex = /^use\s+.*;/gm;
+        let match;
+        let lastUsePosition: vscode.Position | null = null;
+        let alreadyImported = false;
+
+        // Find the position of the last use statement
+        while ((match = importRegex.exec(text)) !== null) {
+            const matchText = match[0];
+            if (matchText.includes(`use App\\Http\\Controllers\\${namespace};`)) {
+                alreadyImported = true;
+                break;
+            }
+            const matchPosition = document.positionAt(match.index + matchText.length);
+            lastUsePosition = new vscode.Position(matchPosition.line + 1, 0);
+        }
+    
+        if (alreadyImported) {
+            return [];
+        }
+
+        if (!lastUsePosition) {
+            const phpTagRegex = /^<\?php/gm;
+            match = phpTagRegex.exec(text);
+            if (match) {
+                lastUsePosition = new vscode.Position(document.positionAt(match.index + match[0].length).line + 1, 0);
+            } else {
+                // Fallback to the very start of the document if no PHP tag found
+                lastUsePosition = new vscode.Position(0, 0);
+            }
+        }
+
+        const importEdit = vscode.TextEdit.insert(lastUsePosition, importStatement);
+        return [importEdit];
     }
 
     onChange() {
@@ -113,7 +165,9 @@ export default class RouteProvider implements vscode.CompletionItemProvider {
 
     loadControllers() {
         try {
-            this.controllers = this.getControllers(Helpers.projectPath("app/Http/Controllers")).map((contoller) => contoller.replace(/@__invoke/, ''));
+            this.controllers = this.getControllers(Helpers.projectPath("app/Http/Controllers")).map((controller) => {
+                return controller.replace(/@__invoke/, '');
+            });
             this.controllers = this.controllers.filter((v, i, a) => a.indexOf(v) === i);
         } catch (exception) {
             console.error(exception);
@@ -128,7 +182,7 @@ export default class RouteProvider implements vscode.CompletionItemProvider {
         }
         if (fs.existsSync(path) && fs.lstatSync(path).isDirectory()) {
             fs.readdirSync(path).forEach(function (file) {
-                if (fs.lstatSync(path+file).isDirectory()) {
+                if (fs.lstatSync(path + file).isDirectory()) {
                     controllers = controllers.concat(self.getControllers(path + file + "/"));
                 } else {
                     if (file.includes(".php")) {
@@ -142,9 +196,10 @@ export default class RouteProvider implements vscode.CompletionItemProvider {
                                 var namespace = matchNamespace[1];
                                 while ((match = functionRegex.exec(controllerContent)) !== null && match[1] !== '__construct') {
                                     if (namespace.length > 0) {
-                                        controllers.push(namespace + '\\' + className + '@' + match[1]);
+                                        controllers.push(`${namespace}\\${className}@${match[1]}`);
+                                    } else {
+                                        controllers.push(`${className}@${match[1]}`);
                                     }
-                                    controllers.push(className + '@' + match[1]);
                                 }
                             }
                         }
