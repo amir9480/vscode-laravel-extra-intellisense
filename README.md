@@ -12,7 +12,7 @@ This extension provides [Laravel](https://laravel.com/) routes, views and ... au
 * [Views and variables](#views-and-variables)
 * [Configs](#configs)
 * [Translations and translation parameters](#translations-and-translation-parameters)
-* [Laravel mix function](#laravel-mix-function)
+* [Laravel mix and vite functions](#laravel-mix-and-vite-functions)
 * [Validation rules](#validation-rules)
 * [View sections and stacks](#view-sections-and-stacks)
 * [Env](#env)
@@ -29,7 +29,7 @@ This extension provides [Laravel](https://laravel.com/) routes, views and ... au
 ![Configs](./images/screenshot-config.gif)
 ### Translations and translation parameters
 ![Translations](./images/screenshot-trans.gif)
-### Laravel mix function
+### Laravel mix and vite functions
 ![Mix](./images/screenshot-mix.gif)
 ### Validation rules
 ![Validation rules](./images/screenshot-validation.gif)
@@ -189,6 +189,7 @@ Also if you writing any sensitive code in your service providers, disable the ex
 * [Laravel Blade Snippets](https://marketplace.visualstudio.com/items?itemName=onecentlin.laravel-blade)
 * [Laravel goto view](https://marketplace.visualstudio.com/items?itemName=codingyu.laravel-goto-view)
 * [Laravel goto controller](https://marketplace.visualstudio.com/items?itemName=stef-k.laravel-goto-controller)
+* [DevDb](https://marketplace.visualstudio.com/items?itemName=damms005.devdb)
 
 ## Credits
 * [PHP parser](https://github.com/glayzzle/php-parser)
