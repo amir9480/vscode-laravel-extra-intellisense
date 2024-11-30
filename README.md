@@ -131,6 +131,7 @@ Also if you writing any sensitive code in your service providers, disable the ex
 * Add change case option for model attributes (#46).
 * Add support workspace with multiple directory (#54).
 * Add nested translations support (#54).
+* Add Vite autocompletion support (#131)
 
 ### 0.5.x
 * Add `asset` support.
