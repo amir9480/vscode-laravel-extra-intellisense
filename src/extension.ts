@@ -49,8 +49,6 @@ export function activate(context: vscode.ExtensionContext) {
 			context.subscriptions.push(vscode.languages.registerCompletionItemProvider(LANGUAGES, new AssetProvider, ...TRIGGER_CHARACTERS));
 			context.subscriptions.push(vscode.languages.registerCompletionItemProvider(LANGUAGES, new EloquentProvider, ...TRIGGER_CHARACTERS.concat(['>'])));
 			context.subscriptions.push(vscode.languages.registerCompletionItemProvider(LANGUAGES, new BladeProvider, '@'));
-
-			suggestDevDbExtension(context);
 		}
 	}
 }
@@ -71,7 +69,7 @@ function showWelcomeMessage(context: vscode.ExtensionContext) {
 		(previousVersionArray[0] < currentVersionArray[0])
 	)
 	) {
-		message = "Laravel Extra Intellisense updated to " + currentVersion + " - New feature: Add blade directives autocomplete.";
+		message = "Laravel Extra Intellisense updated to " + currentVersion + " - New Feature✨ : Add Vite autocompletion support.";
 	}
 	if (message) {
 		vscode.window.showInformationMessage(message, '⭐️ Star on Github', '🐞 Report Bug')
@@ -85,16 +83,14 @@ function showWelcomeMessage(context: vscode.ExtensionContext) {
 				}
 			});
 		context.globalState.update('laravel-extra-intellisense-version', currentVersion);
+	} else {
+		suggestDevDbExtension(context);
 	}
 }
 
 async function suggestDevDbExtension(context: vscode.ExtensionContext) {
-	if (context.extensionMode === vscode.ExtensionMode.Development) {
-		return;
-	}
-
 	const DEVDB_EXTENSION_ID = 'damms005.devdb';
-	const RECOMMENDATION_KEY = 'devdbExtensionRecommendation';
+	const RECOMMENDATION_KEY = 'laravel-extra-intellisense-devdb-extension-recommendation';
 	const isDevDbExtensionInstalled = vscode.extensions.getExtension(DEVDB_EXTENSION_ID) !== undefined;
 
 	if (isDevDbExtensionInstalled) {
@@ -107,14 +103,14 @@ async function suggestDevDbExtension(context: vscode.ExtensionContext) {
 
 	if (!lastRecommendation || aYearSinceLastRecommendation) {
 		const selection = await vscode.window.showInformationMessage(
-			'Enhance your database workflow with DevDb - a zero-config extension to auto-load and display database records.',
+			'Laravel Extra Intellisense Recommendation: Enhance your database workflow with DevDb - a zero-config extension to auto-load and display database records.',
 			'Get DevDb',
 			'Not Now'
 		);
 
 		if (selection === 'Get DevDb') {
 			vscode.commands.executeCommand(
-				'workbench.extensions.installExtension',
+				'extension.open',
 				DEVDB_EXTENSION_ID
 			);
 		}
