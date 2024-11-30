@@ -9,6 +9,7 @@ import ViewProvider from "./ViewProvider";
 import ConfigProvider from './ConfigProvider';
 import TranslationProvider from './TranslationProvider';
 import MixProvider from './MixProvider';
+import ViteProvider from './ViteProvider';
 import ValidationProvider from './ValidationProvider';
 import EnvProvider from './EnvProvider';
 import MiddlewareProvider from './MiddlewareProvider';
@@ -40,6 +41,7 @@ export function activate(context: vscode.ExtensionContext) {
 			context.subscriptions.push(vscode.languages.registerCompletionItemProvider(LANGUAGES, new ConfigProvider, ...TRIGGER_CHARACTERS));
 			context.subscriptions.push(vscode.languages.registerCompletionItemProvider(LANGUAGES, new TranslationProvider, ...TRIGGER_CHARACTERS));
 			context.subscriptions.push(vscode.languages.registerCompletionItemProvider(LANGUAGES, new MixProvider, ...TRIGGER_CHARACTERS));
+			context.subscriptions.push(vscode.languages.registerCompletionItemProvider(LANGUAGES, new ViteProvider(), ...TRIGGER_CHARACTERS));
 			context.subscriptions.push(vscode.languages.registerCompletionItemProvider(LANGUAGES, new ValidationProvider, ...TRIGGER_CHARACTERS.concat(['|'])));
 			context.subscriptions.push(vscode.languages.registerCompletionItemProvider(LANGUAGES, new EnvProvider, ...TRIGGER_CHARACTERS));
 			context.subscriptions.push(vscode.languages.registerCompletionItemProvider(LANGUAGES, new MiddlewareProvider, ...TRIGGER_CHARACTERS));
@@ -67,7 +69,7 @@ function showWelcomeMessage(context: vscode.ExtensionContext) {
 		(previousVersionArray[0] < currentVersionArray[0])
 	)
 	) {
-		message = "Laravel Extra Intellisense updated to " + currentVersion + " - New feature: Add blade directives autocomplete.";
+		message = "Laravel Extra Intellisense updated to " + currentVersion + " - New Feature✨ : Add Vite autocompletion support.";
 	}
 	if (message) {
 		vscode.window.showInformationMessage(message, '⭐️ Star on Github', '🐞 Report Bug')
@@ -81,6 +83,38 @@ function showWelcomeMessage(context: vscode.ExtensionContext) {
 				}
 			});
 		context.globalState.update('laravel-extra-intellisense-version', currentVersion);
+	} else {
+		suggestDevDbExtension(context);
 	}
 }
 
+async function suggestDevDbExtension(context: vscode.ExtensionContext) {
+	const DEVDB_EXTENSION_ID = 'damms005.devdb';
+	const RECOMMENDATION_KEY = 'laravel-extra-intellisense-devdb-extension-recommendation';
+	const isDevDbExtensionInstalled = vscode.extensions.getExtension(DEVDB_EXTENSION_ID) !== undefined;
+
+	if (isDevDbExtensionInstalled) {
+		return;
+	}
+
+	const currentTime = Date.now();
+	const lastRecommendation = context.globalState.get<number>(RECOMMENDATION_KEY);
+	const aYearSinceLastRecommendation = lastRecommendation && (((currentTime - lastRecommendation) > 365 * 24 * 60 * 60 * 1000));
+
+	if (!lastRecommendation || aYearSinceLastRecommendation) {
+		const selection = await vscode.window.showInformationMessage(
+			'Laravel Extra Intellisense Recommendation: Enhance your database workflow with DevDb - a zero-config extension to auto-load and display database records.',
+			'Get DevDb',
+			'Not Now'
+		);
+
+		if (selection === 'Get DevDb') {
+			vscode.commands.executeCommand(
+				'extension.open',
+				DEVDB_EXTENSION_ID
+			);
+		}
+
+		context.globalState.update(RECOMMENDATION_KEY, currentTime);
+	}
+}

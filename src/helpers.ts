@@ -20,6 +20,7 @@ export default class Helpers {
 	static tags:any = {
 		config: 	{classes: ['Config']	, functions: ['config']},
 		mix: 		{classes: []			, functions: ['mix']},
+		vite: 		{classes: []			, functions: ['vite', '@vite']},
 		route: 		{classes: ['Route']		, functions: ['route', 'signedRoute']},
 		trans: 		{classes: ['Lang']		, functions: ['__', 'trans', '@lang']},
 		validation:	{classes: ['Validator'] , functions: ['validate', 'sometimes', 'rules']},
