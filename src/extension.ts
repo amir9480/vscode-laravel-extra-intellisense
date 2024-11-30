@@ -49,6 +49,8 @@ export function activate(context: vscode.ExtensionContext) {
 			context.subscriptions.push(vscode.languages.registerCompletionItemProvider(LANGUAGES, new AssetProvider, ...TRIGGER_CHARACTERS));
 			context.subscriptions.push(vscode.languages.registerCompletionItemProvider(LANGUAGES, new EloquentProvider, ...TRIGGER_CHARACTERS.concat(['>'])));
 			context.subscriptions.push(vscode.languages.registerCompletionItemProvider(LANGUAGES, new BladeProvider, '@'));
+
+			suggestDevDbExtension(context);
 		}
 	}
 }
@@ -86,3 +88,37 @@ function showWelcomeMessage(context: vscode.ExtensionContext) {
 	}
 }
 
+async function suggestDevDbExtension(context: vscode.ExtensionContext) {
+	if (context.extensionMode === vscode.ExtensionMode.Development) {
+		return;
+	}
+
+	const DEVDB_EXTENSION_ID = 'damms005.devdb';
+	const RECOMMENDATION_KEY = 'devdbExtensionRecommendation';
+	const isDevDbExtensionInstalled = vscode.extensions.getExtension(DEVDB_EXTENSION_ID) !== undefined;
+
+	if (isDevDbExtensionInstalled) {
+		return;
+	}
+
+	const currentTime = Date.now();
+	const lastRecommendation = context.globalState.get<number>(RECOMMENDATION_KEY);
+	const aYearSinceLastRecommendation = lastRecommendation && (((currentTime - lastRecommendation) > 365 * 24 * 60 * 60 * 1000));
+
+	if (!lastRecommendation || aYearSinceLastRecommendation) {
+		const selection = await vscode.window.showInformationMessage(
+			'Enhance your database workflow with DevDb - a zero-config extension to auto-load and display database records.',
+			'Get DevDb',
+			'Not Now'
+		);
+
+		if (selection === 'Get DevDb') {
+			vscode.commands.executeCommand(
+				'workbench.extensions.installExtension',
+				DEVDB_EXTENSION_ID
+			);
+		}
+
+		context.globalState.update(RECOMMENDATION_KEY, currentTime);
+	}
+}
