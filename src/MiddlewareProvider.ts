@@ -28,10 +28,10 @@ export default class MiddlewareProvider implements vscode.CompletionItemProvider
 
         if (func.function.includes("middleware")) {
             for (let i in this.middlewares) {
-                var compeleteItem = new vscode.CompletionItem(i, vscode.CompletionItemKind.Enum);
-                compeleteItem.detail = this.middlewares[i];
-                compeleteItem.range = document.getWordRangeAtPosition(position, Helpers.wordMatchRegex);
-                out.push(compeleteItem);
+                var completeItem = new vscode.CompletionItem(i, vscode.CompletionItemKind.Enum);
+                completeItem.detail = this.middlewares[i];
+                completeItem.range = document.getWordRangeAtPosition(position, Helpers.wordMatchRegex);
+                out.push(completeItem);
             }
         }
         return out;

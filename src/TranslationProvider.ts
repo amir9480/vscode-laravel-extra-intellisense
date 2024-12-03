@@ -37,9 +37,9 @@ export default class TranslationProvider implements vscode.CompletionItemProvide
                 for (let i in this.translations) {
                     if (this.translations[i].name === func.parameters[0]) {
                         while ((match = paramRegex.exec(this.translations[i].value)) !== null) {
-                            var compeleteItem = new vscode.CompletionItem(match[1], vscode.CompletionItemKind.Variable);
-                            compeleteItem.range = document.getWordRangeAtPosition(position, Helpers.wordMatchRegex);
-                            out.push(compeleteItem);
+                            var completeItem = new vscode.CompletionItem(match[1], vscode.CompletionItemKind.Variable);
+                            completeItem.range = document.getWordRangeAtPosition(position, Helpers.wordMatchRegex);
+                            out.push(completeItem);
                         }
                         return out;
                     }
