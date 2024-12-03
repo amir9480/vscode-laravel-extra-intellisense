@@ -37,9 +37,9 @@ export default class RouteProvider implements vscode.CompletionItemProvider {
                     // Route action autocomplete.
                     for (let i in this.controllers) {
                         if (typeof this.controllers[i] === "string" && this.controllers[i].length > 0) {
-                            var compeleteItem2 = new vscode.CompletionItem(this.controllers[i], vscode.CompletionItemKind.Enum);
-                            compeleteItem2.range = document.getWordRangeAtPosition(position, Helpers.wordMatchRegex);
-                            out.push(compeleteItem2);
+                            var completeItem2 = new vscode.CompletionItem(this.controllers[i], vscode.CompletionItemKind.Enum);
+                            completeItem2.range = document.getWordRangeAtPosition(position, Helpers.wordMatchRegex);
+                            out.push(completeItem2);
                         }
                     }
                 }
@@ -49,9 +49,9 @@ export default class RouteProvider implements vscode.CompletionItemProvider {
                     for (let i in this.routes) {
                         if (this.routes[i].name === func.parameters[0]) {
                             for (var j in this.routes[i].parameters) {
-                                var compeleteItem = new vscode.CompletionItem(this.routes[i].parameters[j], vscode.CompletionItemKind.Variable);
-                                compeleteItem.range = document.getWordRangeAtPosition(position, Helpers.wordMatchRegex);
-                                out.push(compeleteItem);
+                                var completeItem = new vscode.CompletionItem(this.routes[i].parameters[j], vscode.CompletionItemKind.Variable);
+                                completeItem.range = document.getWordRangeAtPosition(position, Helpers.wordMatchRegex);
+                                out.push(completeItem);
                             }
                             return out;
                         }
@@ -61,14 +61,14 @@ export default class RouteProvider implements vscode.CompletionItemProvider {
                 // Route name autocomplete
                 for (let i in this.routes) {
                     if (typeof this.routes[i].name === "string" && this.routes[i].name.length > 0) {
-                        var compeleteItem3 = new vscode.CompletionItem(this.routes[i].name, vscode.CompletionItemKind.Enum);
-                        compeleteItem3.range = document.getWordRangeAtPosition(position, Helpers.wordMatchRegex);
-                        compeleteItem3.detail = this.routes[i].action +
+                        var completeItem3 = new vscode.CompletionItem(this.routes[i].name, vscode.CompletionItemKind.Enum);
+                        completeItem3.range = document.getWordRangeAtPosition(position, Helpers.wordMatchRegex);
+                        completeItem3.detail = this.routes[i].action +
                                                 "\n\n" +
                                                 this.routes[i].method +
                                                 ":" +
                                                 this.routes[i].uri;
-                        out.push(compeleteItem3);
+                        out.push(completeItem3);
                     }
                 }
             }

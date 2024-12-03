@@ -178,7 +178,7 @@ Also if you writing any sensitive code in your service providers, disable the ex
 * Config autocomplete added.
 * Route bug fix.
 * View names with namespaces ready to use.
-* View functions autocompelete added.
+* View functions autocomplete added.
 * Blade bug fix.
 * Add route autocomplete.
 

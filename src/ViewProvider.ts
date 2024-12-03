@@ -29,9 +29,9 @@ export default class ViewProvider implements vscode.CompletionItemProvider {
         if (func && ((func.class && Helpers.tags.view.classes.some((cls:string) => func.class.includes(cls))) || Helpers.tags.view.functions.some((fn:string) => func.function.includes(fn)))) {
             if (func.paramIndex === 0) {
                 for (let i in this.views) {
-                    var compeleteItem = new vscode.CompletionItem(i, vscode.CompletionItemKind.Constant);
-                    compeleteItem.range = document.getWordRangeAtPosition(position, Helpers.wordMatchRegex);
-                    out.push(compeleteItem);
+                    var completeItem = new vscode.CompletionItem(i, vscode.CompletionItemKind.Constant);
+                    completeItem.range = document.getWordRangeAtPosition(position, Helpers.wordMatchRegex);
+                    out.push(completeItem);
                 }
             } else if (typeof this.views[func.parameters[0]] !== 'undefined') {
                 var viewContent = fs.readFileSync(this.views[func.parameters[0]], 'utf8');
@@ -43,9 +43,9 @@ export default class ViewProvider implements vscode.CompletionItemProvider {
                 }
                 variableNames = variableNames.filter((v, i, a) => a.indexOf(v) === i);
                 for (let i in variableNames) {
-                    var variableCompeleteItem = new vscode.CompletionItem(variableNames[i], vscode.CompletionItemKind.Constant);
-                    variableCompeleteItem.range = document.getWordRangeAtPosition(position, Helpers.wordMatchRegex);
-                    out.push(variableCompeleteItem);
+                    var variableCompleteItem = new vscode.CompletionItem(variableNames[i], vscode.CompletionItemKind.Constant);
+                    variableCompleteItem.range = document.getWordRangeAtPosition(position, Helpers.wordMatchRegex);
+                    out.push(variableCompleteItem);
                 }
             }
         } else if (func && (func.function === '@section' || func.function === '@push')) {
@@ -65,14 +65,14 @@ export default class ViewProvider implements vscode.CompletionItemProvider {
                 if (func === '@push') {
                     yieldRegex = /@stack\s*\([\'\"]([A-Za-z0-9_\-\.]+)[\'\"](,.*)?\)/g;
                 }
-                var yeildNames = [];
+                var yieldNames = [];
                 while (regexResult = yieldRegex.exec(parentContent)) {
-                    yeildNames.push(regexResult[1]);
+                    yieldNames.push(regexResult[1]);
                 }
-                yeildNames = yeildNames.filter((v, i, a) => a.indexOf(v) === i);
-                for (var i in yeildNames) {
-                    var yieldCompeleteItem = new vscode.CompletionItem(yeildNames[i], vscode.CompletionItemKind.Constant);
-                    out.push(yieldCompeleteItem);
+                yieldNames = yieldNames.filter((v, i, a) => a.indexOf(v) === i);
+                for (var i in yieldNames) {
+                    var yieldCompleteItem = new vscode.CompletionItem(yieldNames[i], vscode.CompletionItemKind.Constant);
+                    out.push(yieldCompleteItem);
                 }
                 out = out.concat(this.getYields(func, parentContent));
             }
