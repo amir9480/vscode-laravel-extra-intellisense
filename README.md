@@ -7,6 +7,8 @@
 
 This extension provides [Laravel](https://laravel.com/) routes, views and ... autocomplete for [VSCode](https://code.visualstudio.com/).
 
+<b>Please read the [security note](#security-note) and [how to configure](#sample-config-to-use-docker) before using the extension. </b>
+
 ## Autocomplete
 * [Route names and route parameters](#route-names-and-route-parameters)
 * [Views and variables](#views-and-variables)
