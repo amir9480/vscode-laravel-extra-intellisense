@@ -83,8 +83,6 @@ function showWelcomeMessage(context: vscode.ExtensionContext) {
 				}
 			});
 		context.globalState.update('laravel-extra-intellisense-version', currentVersion);
-	} else {
-		suggestDevDbExtension(context);
 	}
 }
 
