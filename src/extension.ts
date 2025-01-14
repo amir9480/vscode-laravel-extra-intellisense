@@ -17,6 +17,7 @@ import AuthProvider from './AuthProvider';
 import AssetProvider from './AssetProvider';
 import EloquentProvider from './EloquentProvider';
 import BladeProvider from './BladeProvider';
+import { sep } from 'path';
 
 
 export function activate(context: vscode.ExtensionContext) {
@@ -94,8 +95,8 @@ function showWelcomeMessage(context: vscode.ExtensionContext) {
 
 function isDatabaseRelatedFile(document: vscode.TextDocument): boolean {
 	const filePath = document.uri.fsPath;
-	const isInModelsPath = filePath.includes('app/Models');
-	const isInDatabasePath = filePath.includes('database/');
+	const isInModelsPath = filePath.includes(`app${sep}Models`);
+	const isInDatabasePath = filePath.includes(`database${sep}`);
 
 	return isInModelsPath || isInDatabasePath
 }
