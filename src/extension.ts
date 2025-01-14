@@ -21,6 +21,12 @@ import BladeProvider from './BladeProvider';
 
 export function activate(context: vscode.ExtensionContext) {
 	showWelcomeMessage(context);
+	vscode.workspace.onDidOpenTextDocument((document) => {
+		if (isDatabaseRelatedFile(document)) {
+			suggestDevDbExtension(context);
+		}
+	});
+
 	if (vscode.workspace.workspaceFolders instanceof Array && vscode.workspace.workspaceFolders.length > 0) {
 		if (fs.existsSync(Helpers.projectPath("artisan"))) {
 			if (Helpers.outputChannel === null) {
@@ -86,12 +92,21 @@ function showWelcomeMessage(context: vscode.ExtensionContext) {
 	}
 }
 
+function isDatabaseRelatedFile(document: vscode.TextDocument): boolean {
+	const filePath = document.uri.fsPath;
+	const isInModelsPath = filePath.includes('app/Models');
+	const isInDatabasePath = filePath.includes('database/');
+
+	return isInModelsPath || isInDatabasePath
+}
+
 async function suggestDevDbExtension(context: vscode.ExtensionContext) {
 	const DEVDB_EXTENSION_ID = 'damms005.devdb';
 	const RECOMMENDATION_KEY = 'laravel-extra-intellisense-devdb-extension-recommendation';
+	const NOT_INTERESTED_KEY = 'laravel-extra-intellisense-devdb-extension-not-interested';
 	const isDevDbExtensionInstalled = vscode.extensions.getExtension(DEVDB_EXTENSION_ID) !== undefined;
 
-	if (isDevDbExtensionInstalled) {
+	if (isDevDbExtensionInstalled || context.globalState.get<boolean>(NOT_INTERESTED_KEY)) {
 		return;
 	}
 
@@ -103,7 +118,8 @@ async function suggestDevDbExtension(context: vscode.ExtensionContext) {
 		const selection = await vscode.window.showInformationMessage(
 			'Laravel Extra Intellisense Recommendation: Enhance your database workflow with DevDb - a zero-config extension to auto-load and display database records.',
 			'Get DevDb',
-			'Not Now'
+			'Not Interested',
+			'Remind Me Later'
 		);
 
 		if (selection === 'Get DevDb') {
@@ -111,8 +127,10 @@ async function suggestDevDbExtension(context: vscode.ExtensionContext) {
 				'extension.open',
 				DEVDB_EXTENSION_ID
 			);
+		} else if (selection === 'Not Interested') {
+			context.globalState.update(NOT_INTERESTED_KEY, true);
+		} else if (selection === 'Remind Me Later') {
+			context.globalState.update(RECOMMENDATION_KEY, currentTime);
 		}
-
-		context.globalState.update(RECOMMENDATION_KEY, currentTime);
 	}
 }
