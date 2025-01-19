@@ -69,7 +69,7 @@ function showWelcomeMessage(context: vscode.ExtensionContext) {
 	let previousVersionArray = previousVersion ? previousVersion.split('.').map((s: string) => Number(s)) : [0, 0, 0];
 	let currentVersionArray = currentVersion.split('.').map((s: string) => Number(s));
 	if (previousVersion === undefined || previousVersion.length === 0) {
-		message = "Thanks for using Laravel Extra Intellisense.";
+		message = "Thanks for using Laravel Extra Intellisense. Please consider configure the extension settings, so it can boot your Laravel project currectly and get data needed for autocompletion.";
 	} else if (currentVersion !== previousVersion && (
 		// (previousVersionArray[0] === currentVersionArray[0] && previousVersionArray[1] === currentVersionArray[1] && previousVersionArray[2] < currentVersionArray[2]) ||
 		(previousVersionArray[0] === currentVersionArray[0] && previousVersionArray[1] < currentVersionArray[1]) ||
@@ -117,13 +117,13 @@ async function suggestDevDbExtension(context: vscode.ExtensionContext) {
 
 	if (!lastRecommendation || aYearSinceLastRecommendation) {
 		const selection = await vscode.window.showInformationMessage(
-			'Laravel Extra Intellisense Recommendation: Enhance your database workflow with DevDb - a zero-config extension to auto-load and display database records.',
-			'Get DevDb',
+			'Would you like to have Laravel Eloquent model code lens and query explainer?',
+			'Check it Out',
 			'Not Interested',
 			'Remind Me Later'
 		);
 
-		if (selection === 'Get DevDb') {
+		if (selection === 'Check it Out') {
 			vscode.commands.executeCommand(
 				'extension.open',
 				DEVDB_EXTENSION_ID
