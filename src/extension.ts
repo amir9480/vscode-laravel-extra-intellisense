@@ -17,6 +17,7 @@ import AuthProvider from './AuthProvider';
 import AssetProvider from './AssetProvider';
 import EloquentProvider from './EloquentProvider';
 import BladeProvider from './BladeProvider';
+import RouteControllerDefinitionProvider from './RouteControllerDefinitionProvider';
 import { sep } from 'path';
 
 
@@ -56,6 +57,7 @@ export function activate(context: vscode.ExtensionContext) {
 			context.subscriptions.push(vscode.languages.registerCompletionItemProvider(LANGUAGES, new AssetProvider, ...TRIGGER_CHARACTERS));
 			context.subscriptions.push(vscode.languages.registerCompletionItemProvider(LANGUAGES, new EloquentProvider, ...TRIGGER_CHARACTERS.concat(['>'])));
 			context.subscriptions.push(vscode.languages.registerCompletionItemProvider(LANGUAGES, new BladeProvider, '@'));
+			context.subscriptions.push(vscode.languages.registerDefinitionProvider(LANGUAGES, new RouteControllerDefinitionProvider));
 		}
 	}
 }
