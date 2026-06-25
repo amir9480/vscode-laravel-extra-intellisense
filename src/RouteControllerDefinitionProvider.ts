@@ -76,7 +76,7 @@ export default class RouteControllerDefinitionProvider implements vscode.Definit
         //   Route::controller(X::class)->group(... {
         //   ->controller(X::class)->group(... {       (chained)
         // Captures class name and finds the opening { of the group callback.
-        const pattern = /(?:->|::)controller\s*\(\s*([\\A-Za-z0-9_]+)::class\s*\)\s*(?:->[^{]+)?\{/g;
+        const pattern = /(?:->|::)controller\s*\(\s*([\\A-Za-z0-9_]+)::class\s*\)\s*(?:->(?:[^{]|\{[^}]*\})+)?\{/g;
 
         interface Candidate {
             controllerClass: string;
