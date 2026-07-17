@@ -191,7 +191,7 @@ export default class Helpers {
 						resolve(stdout);
 					} else {
 						const errorOutput = stderr.length > 0 ? stderr : stdout;
-						Helpers.outputChannel?.error("Laravel Extra Intellisense Error:\n " + (description ?? '') + '\n\n' + errorOutput);
+						Helpers.outputChannel?.error("Laravel Extra Intellisense Error:\n" + (description ?? '') + '\n\n' + code + '\n\n' + errorOutput);
 						Helpers.showErrorPopup();
 						error(errorOutput);
 					}
@@ -330,9 +330,26 @@ export default class Helpers {
 				return resolve(self.modelsCache);
 			} else {
 				Helpers.runLaravel(`
-					echo json_encode(array_values(array_filter(array_map(function ($name) {return app()->getNamespace().str_replace([app_path().'/', app_path().'\\\\', '.php', '/'], ['', '', '', '\\\\'], $name);}, array_merge(glob(app_path('*')), glob(app_path('Models/*')))), function ($class) {
-						return class_exists($class) && is_subclass_of($class, 'Illuminate\\\\Database\\\\Eloquent\\\\Model');
-					})));
+					$manifest = \\Illuminate\\Support\\Facades\\File::json(base_path('composer.json'));
+					$statics = collect($manifest['autoload']['files'] ?? [])->map('realpath');
+
+					echo collect(array_merge(glob(app_path('*')), glob(app_path('Models/*'))))
+						->filter(function ($path) use ($statics) {
+							return !$statics->contains(realpath($path));
+						})
+						->map(function ($name) {
+							return app()->getNamespace() . str_replace(
+								[app_path().'/', app_path().'\\\\', '.php', '/'],
+								['', '', '', '\\\\'],
+								$name
+							);
+						})
+						->filter(function ($class) {
+							return class_exists($class)
+								&& is_subclass_of($class, 'Illuminate\\\\Database\\\\Eloquent\\\\Model');
+						})
+						->values()
+						->toJson();
 				`, "Application Models").then(function (result) {
 					var models = JSON.parse(result);
 					self.modelsCache = models;
